@@ -36,8 +36,11 @@ def clean_bls_data(df: pd.DataFrame) -> pd.DataFrame:
     df['value'] = pd.to_numeric(df['value'], errors='coerce')
     print('Converted Value column to numeric')
 
+     # Print how many rows become NaN
+    print("Rows with non-numeric 'value':", df["value"].isna().sum())
+
     # Convert Date column to datetime
-    df['date'] = pd.to_datetime(df['label'], format='%Y-%b', errors='coerce')
+    df['date'] = pd.to_datetime(df['label'], format='%Y %b', errors='coerce')
     print('Converted Date column to datetime')
 
     # Drop rows with missing value or date
