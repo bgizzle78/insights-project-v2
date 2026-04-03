@@ -16,3 +16,11 @@ data/processed/
 # OS
 .DS_Store
 Thumbs.db
+
+# Ignore all .csv and .parquet files by default
+*.csv
+*.parquet
+
+# Allow final, presentation ready datasets
+!data/final
+!data/final/*.csv
