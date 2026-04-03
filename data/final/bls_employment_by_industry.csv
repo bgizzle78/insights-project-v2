@@ -1,0 +1,281 @@
+industry,year,avg_employment
+Construction,2006,39425
+Construction,2007,38933
+Construction,2008,38908
+Construction,2009,34075
+Construction,2010,32792
+Construction,2011,33000
+Construction,2012,35592
+Construction,2013,34358
+Construction,2014,33775
+Construction,2015,32475
+Construction,2016,30050
+Construction,2017,31508
+Construction,2018,40100
+Construction,2019,35425
+Construction,2020,29725
+Construction,2021,30817
+Construction,2022,31767
+Construction,2023,33000
+Construction,2024,33817
+Construction,2025,35742
+Finance and Insurance,2006,21250
+Finance and Insurance,2007,20925
+Finance and Insurance,2008,20625
+Finance and Insurance,2009,19775
+Finance and Insurance,2010,19167
+Finance and Insurance,2011,18600
+Finance and Insurance,2012,18242
+Finance and Insurance,2013,18033
+Finance and Insurance,2014,17675
+Finance and Insurance,2015,17417
+Finance and Insurance,2016,17192
+Finance and Insurance,2017,16950
+Finance and Insurance,2018,17242
+Finance and Insurance,2019,17267
+Finance and Insurance,2020,17367
+Finance and Insurance,2021,18150
+Finance and Insurance,2022,18717
+Finance and Insurance,2023,18883
+Finance and Insurance,2024,18858
+Finance and Insurance,2025,18750
+Government,2006,145608
+Government,2007,144200
+Government,2008,147500
+Government,2009,150025
+Government,2010,153617
+Government,2011,151658
+Government,2012,153742
+Government,2013,153717
+Government,2014,152600
+Government,2015,153375
+Government,2016,156383
+Government,2017,153583
+Government,2018,152625
+Government,2019,152508
+Government,2020,148142
+Government,2021,147000
+Government,2022,150592
+Government,2023,150675
+Government,2024,151108
+Government,2025,149450
+Health Care and Social Assistance,2006,102408
+Health Care and Social Assistance,2007,103817
+Health Care and Social Assistance,2008,106658
+Health Care and Social Assistance,2009,109242
+Health Care and Social Assistance,2010,110883
+Health Care and Social Assistance,2011,113275
+Health Care and Social Assistance,2012,115633
+Health Care and Social Assistance,2013,116342
+Health Care and Social Assistance,2014,116358
+Health Care and Social Assistance,2015,117250
+Health Care and Social Assistance,2016,118025
+Health Care and Social Assistance,2017,118792
+Health Care and Social Assistance,2018,119367
+Health Care and Social Assistance,2019,121433
+Health Care and Social Assistance,2020,119842
+Health Care and Social Assistance,2021,120375
+Health Care and Social Assistance,2022,121625
+Health Care and Social Assistance,2023,127350
+Health Care and Social Assistance,2024,133958
+Health Care and Social Assistance,2025,137025
+Information,2006,11508
+Information,2007,11408
+Information,2008,11158
+Information,2009,10433
+Information,2010,10308
+Information,2011,10175
+Information,2012,9575
+Information,2013,9608
+Information,2014,9608
+Information,2015,9683
+Information,2016,9533
+Information,2017,8658
+Information,2018,8225
+Information,2019,8067
+Information,2020,7208
+Information,2021,7208
+Information,2022,7842
+Information,2023,7883
+Information,2024,7858
+Information,2025,7983
+Leisure and Hospitality,2006,70958
+Leisure and Hospitality,2007,71658
+Leisure and Hospitality,2008,72883
+Leisure and Hospitality,2009,71883
+Leisure and Hospitality,2010,72092
+Leisure and Hospitality,2011,72850
+Leisure and Hospitality,2012,74283
+Leisure and Hospitality,2013,74633
+Leisure and Hospitality,2014,74300
+Leisure and Hospitality,2015,74575
+Leisure and Hospitality,2016,74392
+Leisure and Hospitality,2017,74292
+Leisure and Hospitality,2018,74242
+Leisure and Hospitality,2019,75092
+Leisure and Hospitality,2020,61442
+Leisure and Hospitality,2021,67258
+Leisure and Hospitality,2022,70117
+Leisure and Hospitality,2023,71683
+Leisure and Hospitality,2024,71600
+Leisure and Hospitality,2025,69308
+Manufacturing,2006,61108
+Manufacturing,2007,59100
+Manufacturing,2008,56600
+Manufacturing,2009,50550
+Manufacturing,2010,49183
+Manufacturing,2011,49508
+Manufacturing,2012,49175
+Manufacturing,2013,48450
+Manufacturing,2014,47942
+Manufacturing,2015,47717
+Manufacturing,2016,46925
+Manufacturing,2017,46775
+Manufacturing,2018,47050
+Manufacturing,2019,47158
+Manufacturing,2020,44592
+Manufacturing,2021,45417
+Manufacturing,2022,46283
+Manufacturing,2023,46267
+Manufacturing,2024,46142
+Manufacturing,2025,45600
+Mining and Logging,2006,27983
+Mining and Logging,2007,28608
+Mining and Logging,2008,31142
+Mining and Logging,2009,29825
+Mining and Logging,2010,30083
+Mining and Logging,2011,33667
+Mining and Logging,2012,33533
+Mining and Logging,2013,31733
+Mining and Logging,2014,30142
+Mining and Logging,2015,25958
+Mining and Logging,2016,20350
+Mining and Logging,2017,21817
+Mining and Logging,2018,22600
+Mining and Logging,2019,22275
+Mining and Logging,2020,17567
+Mining and Logging,2021,17758
+Mining and Logging,2022,19950
+Mining and Logging,2023,21158
+Mining and Logging,2024,21283
+Mining and Logging,2025,20833
+Other Services,2006,25350
+Other Services,2007,25250
+Other Services,2008,25308
+Other Services,2009,25275
+Other Services,2010,25058
+Other Services,2011,25017
+Other Services,2012,25275
+Other Services,2013,25425
+Other Services,2014,25267
+Other Services,2015,24908
+Other Services,2016,24533
+Other Services,2017,24567
+Other Services,2018,24408
+Other Services,2019,24358
+Other Services,2020,22117
+Other Services,2021,22992
+Other Services,2022,23850
+Other Services,2023,23917
+Other Services,2024,24000
+Other Services,2025,24217
+Private Educational Services,2006,7875
+Private Educational Services,2007,7458
+Private Educational Services,2008,6908
+Private Educational Services,2009,6783
+Private Educational Services,2010,6967
+Private Educational Services,2011,6858
+Private Educational Services,2012,7100
+Private Educational Services,2013,6783
+Private Educational Services,2014,7267
+Private Educational Services,2015,8350
+Private Educational Services,2016,8292
+Private Educational Services,2017,8742
+Private Educational Services,2018,8783
+Private Educational Services,2019,8908
+Private Educational Services,2020,7858
+Private Educational Services,2021,6717
+Private Educational Services,2022,6717
+Private Educational Services,2023,6808
+Private Educational Services,2024,7025
+Private Educational Services,2025,6842
+Professional and Business Services,2006,59850
+Professional and Business Services,2007,60708
+Professional and Business Services,2008,61025
+Professional and Business Services,2009,60225
+Professional and Business Services,2010,61092
+Professional and Business Services,2011,63542
+Professional and Business Services,2012,64633
+Professional and Business Services,2013,64817
+Professional and Business Services,2014,66908
+Professional and Business Services,2015,67067
+Professional and Business Services,2016,65733
+Professional and Business Services,2017,66783
+Professional and Business Services,2018,68942
+Professional and Business Services,2019,69233
+Professional and Business Services,2020,65767
+Professional and Business Services,2021,68250
+Professional and Business Services,2022,72117
+Professional and Business Services,2023,72408
+Professional and Business Services,2024,71900
+Professional and Business Services,2025,71775
+Real Estate and Rental and Leasing,2006,7517
+Real Estate and Rental and Leasing,2007,7592
+Real Estate and Rental and Leasing,2008,7458
+Real Estate and Rental and Leasing,2009,7025
+Real Estate and Rental and Leasing,2010,6992
+Real Estate and Rental and Leasing,2011,6692
+Real Estate and Rental and Leasing,2012,6700
+Real Estate and Rental and Leasing,2013,6650
+Real Estate and Rental and Leasing,2014,6858
+Real Estate and Rental and Leasing,2015,6817
+Real Estate and Rental and Leasing,2016,6617
+Real Estate and Rental and Leasing,2017,6458
+Real Estate and Rental and Leasing,2018,6592
+Real Estate and Rental and Leasing,2019,6683
+Real Estate and Rental and Leasing,2020,6367
+Real Estate and Rental and Leasing,2021,6450
+Real Estate and Rental and Leasing,2022,6642
+Real Estate and Rental and Leasing,2023,6858
+Real Estate and Rental and Leasing,2024,6950
+Real Estate and Rental and Leasing,2025,6900
+Total Nonfarm,2006,722683
+Total Nonfarm,2007,722892
+Total Nonfarm,2008,727808
+Total Nonfarm,2009,710933
+Total Nonfarm,2010,712817
+Total Nonfarm,2011,720158
+Total Nonfarm,2012,728992
+Total Nonfarm,2013,726192
+Total Nonfarm,2014,724017
+Total Nonfarm,2015,720900
+Total Nonfarm,2016,711650
+Total Nonfarm,2017,710133
+Total Nonfarm,2018,720408
+Total Nonfarm,2019,715733
+Total Nonfarm,2020,668333
+Total Nonfarm,2021,681258
+Total Nonfarm,2022,698533
+Total Nonfarm,2023,709508
+Total Nonfarm,2024,717483
+Total Nonfarm,2025,716792
+"Trade, Transportation, and Utilities",2006,141842
+"Trade, Transportation, and Utilities",2007,143233
+"Trade, Transportation, and Utilities",2008,141633
+"Trade, Transportation, and Utilities",2009,135817
+"Trade, Transportation, and Utilities",2010,134583
+"Trade, Transportation, and Utilities",2011,135317
+"Trade, Transportation, and Utilities",2012,135508
+"Trade, Transportation, and Utilities",2013,135642
+"Trade, Transportation, and Utilities",2014,135317
+"Trade, Transportation, and Utilities",2015,135308
+"Trade, Transportation, and Utilities",2016,133625
+"Trade, Transportation, and Utilities",2017,131208
+"Trade, Transportation, and Utilities",2018,130233
+"Trade, Transportation, and Utilities",2019,127325
+"Trade, Transportation, and Utilities",2020,120342
+"Trade, Transportation, and Utilities",2021,122867
+"Trade, Transportation, and Utilities",2022,122317
+"Trade, Transportation, and Utilities",2023,122617
+"Trade, Transportation, and Utilities",2024,122983
+"Trade, Transportation, and Utilities",2025,122367

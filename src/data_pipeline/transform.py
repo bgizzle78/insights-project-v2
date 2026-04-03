@@ -53,38 +53,102 @@ def map_series_to_industry(df: pd.DataFrame) -> pd.DataFrame:
 
 # Function: filter_relevant_data
 def filter_relevant_data(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Filter to relevant geography, seasonal adjustment, etc.
-    """
+    """Keep only relevant columns for analysis. (No filtering needed since data was pre-filtered upstream)"""
     df = df.copy()
 
-    # TODO: Add filters if needed
+    # Keep only columns needed for analysis
+    columns_to_keep = [
+        'series_id',
+        'industry',
+        'date',
+        'value'
+    ]
+
+    # Only keep columns that exist (prevents errors)
+    df = df[[col for col in columns_to_keep if col in df.columns]]
+
+    # Sanity checks (no filtering)
+    print(f'Unique series count: {df["series_id"].nunique()}')
+
+    if 'industry' in df.columns:
+        print(f'Industries present: {df["industry"].nunique()}')
+
+    print(f'Date range: {df["date"].min()} to {df["date"].max()}')
+
+    print(df.columns)
+    
+    print(df.head())
+
     return df
 
 # Function: aggregate_employment
 def aggregate_employment(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Aggregate employment data for analysis
-    """
+    """Aggregate employment data to yearly averages by industry"""
     df = df.copy()
 
-    # TODO: Example:
-    # group by industry + date
-    # df = df.groupby(['industry', 'date'])['value'].mean().reset_index()
+    # Extract year from date
+    df['year'] = df['date'].dt.year
+
+    # Group and aggregate
+    df = (
+        df.groupby(['industry', 'year'])['value']
+        .mean()
+        .reset_index()
+    )
+
+    # Rename for clarity
+    df = df.rename(columns={'value': 'avg_employment'})
+
+    # Multiply by 1000 to get readable employment numbers
+    df['avg_employment'] = (df['avg_employment'] * 1000).round().astype(int)
+
+    df = df.sort_values(['industry', 'year'])
+
+    print(df.head(10))
+    print(df.columns)
 
     return df
 
 # Function: aggregate_unemployment
 def aggregate_unemployment(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Aggregate unemployment data
-    """
+    """Transform unemployment dataset into a clean, wide, yearly table:
+    columns: year, unemployment_rate, labor_force_participation_rate, labor_force"""
     df = df.copy()
 
-    # TODO: Example:
-    # df = df.groupby('date')['value'].mean().reset_index()
+    # Map series_id to metric
+    series_map = {
+        'LASST540000000000003': 'unemployment_rate',
+        'LASST540000000000008': 'labor_force_participation_rate',
+        'LAUST540000000000006': 'labor_force'
+    }
+    df['metric'] = df['series_id'].map(series_map)
 
-    return df
+    # Extract year
+    df['year'] = df['date'].dt.year
+
+    # Pivot to wide table
+    df_wide = df.pivot_table(
+        index='year',
+        columns='metric',
+        values='value',
+        aggfunc='mean'
+    ).reset_index()
+
+    # Ensure column order
+    df_wide = df_wide[[
+        'year', 
+        'unemployment_rate', 
+        'labor_force_participation_rate', 
+        'labor_force'
+    ]]
+
+    # Sort by year
+    df_wide = df_wide.sort_values('year')
+
+    print(df.head(10))
+    print(df.columns)
+
+    return df_wide
 
 
 # Function: save_data
