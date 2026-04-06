@@ -1,0 +1,49 @@
+# INSIGHTS-PROJECT-V2: ETL & Run Instructions
+
+## 1. Set up Python environment
+- Make sure Python 3.10+ is installed
+- Install requirements:
+    pip install -r requirements.txt
+
+## 2. Folder structure
+Ensure you have the following:
+data/
+  raw/          -> original source CSVs
+  processed/    -> intermediate processed CSVs
+  final/        -> fully transformed CSVs
+
+src/
+  __init__.py
+  config.py
+  data_pipeline/
+    extract/
+      __init__.py
+    transform/
+      __init__.py
+    load/
+      __init__.py
+
+## 3. Run ETL scripts
+- Run scripts as Python modules from the project root (important for imports):
+
+### Extract WVSOS
+    python -m src.data_pipeline.extract.extract_wvsos
+
+### Transform WVSOS
+    python -m src.data_pipeline.transform.transform_wvsos
+
+### Load WVSOS to PostgreSQL
+    python -m src.data_pipeline.load.load_wvsos
+
+### BLS / BEA scripts
+Follow the same module pattern:
+    python -m src.data_pipeline.extract.extract_bls
+    python -m src.data_pipeline.transform.transform_bls
+    python -m src.data_pipeline.extract.extract_bea
+    etc.
+
+## 4. Notes
+- Do not run scripts by direct file path (e.g., python src/data_pipeline/extract/extract_wvsos.py)
+- All scripts rely on `src.config` paths and global settings
+- Intermediate outputs are in `data/processed/`
+- Final outputs are in `data/final/`
