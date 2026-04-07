@@ -69,7 +69,7 @@ def add_year_columns(df: pd.DataFrame, date_columns: dict) -> pd.DataFrame:
 def map_naics_to_industry(df: pd.DataFrame, naics_col='naics', industry_col='industry') -> pd.DataFrame:
     """Maps 2-digit NAICS codes to BLS/BEA industries."""
     def mapper(sector):
-        if pd.isna(sector) or sector == 'unknown':
+        if pd.isna(sector) or str(sector).lower() == 'unknown':
             return 'Unmapped'
         sector = str(int(sector))[:2]  # Convert to string and get first 2 digits
         if sector in ['21', '11']:

@@ -8,7 +8,7 @@ from src.utils import clean_column_names, parse_dates, save_csv
 def load_wvsos_data():
     """Load the raw WVSOS CSV file."""
     try:
-        df = pd.read_csv(WVSOS_RAW_PATH)
+        df = pd.read_csv(WVSOS_RAW_PATH, low_memory=False)
         print(f'Loaded {len(df)} rows from {WVSOS_RAW_PATH}')
         return df
     except FileNotFoundError:

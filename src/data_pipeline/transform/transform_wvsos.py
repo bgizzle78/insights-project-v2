@@ -1,5 +1,6 @@
 # Imports
 import pandas as pd
+from pathlib import Path
 from typing import Tuple
 from src.config import WVSOS_PROCESSED_PATH, WVSOS_FINAL_PATH, START_YEAR, END_YEAR
 from src.utils import filter_year_range, add_year_columns, fill_unknown, save_csv, calculate_active_orgs, map_naics_to_industry
@@ -30,8 +31,8 @@ def filter_and_clean(df: pd.DataFrame) -> pd.DataFrame:
     print('Filled unknown categorical fields')
 
     # Ensure NAICS has consistent unknown values
-    df['naics'] = df['naics'].fillna('Unknown Industry')
-    print('Standardized NAICS missing values to Unknown Industry')
+    df['naics'] = df['naics'].fillna('unknown')
+    print('Standardized NAICS missing values to unknown')
     return df
 
 
@@ -50,8 +51,8 @@ def map_industries(df: pd.DataFrame) -> pd.DataFrame:
     print('Mapped NAICS codes to industries')
 
     # QA check
-    unmapped_count = (df['industry'] == 'Unmapped').sum()
-    print(f"Unmapped industries: {unmapped_count}")
+    unmapped_count = (df['industry'] == 'Unknown Industry').sum()
+    print(f"Unknown industries: {unmapped_count}")
     return df
 
 # Aggregate yearly metrics
@@ -108,9 +109,13 @@ def breakdown_by_category(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]
 # Save final outputs
 def save_final_data(yearly_df: pd.DataFrame, industry_df: pd.DataFrame, orgtype_df: pd.DataFrame):
     print('Saving final CSV outputs...')
-    save_csv(yearly_df, WVSOS_FINAL_PATH.replace('.csv','_yearly.csv'))
-    save_csv(industry_df, WVSOS_FINAL_PATH.replace('.csv','_industry.csv'))
-    save_csv(orgtype_df, WVSOS_FINAL_PATH.replace('.csv','_orgtype.csv'))
+    yearly_path = WVSOS_FINAL_PATH.with_name(WVSOS_FINAL_PATH.stem + '_yearly.csv')
+    industry_path = WVSOS_FINAL_PATH.with_name(WVSOS_FINAL_PATH.stem + '_industry.csv')
+    orgtype_path = WVSOS_FINAL_PATH.with_name(WVSOS_FINAL_PATH.stem + '_orgtype.csv')
+
+    save_csv(yearly_df, yearly_path)
+    save_csv(industry_df, industry_path)
+    save_csv(orgtype_df, orgtype_path)
     print('Final WVSOS data saved.')
 
 # Main pipeline

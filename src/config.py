@@ -13,7 +13,7 @@ FINAL_DATA_DIR = DATA_DIR / 'final'
 
 # File Paths
 WVSOS_RAW_PATH = RAW_DATA_DIR / 'WVSOS Business Registrations Complete Data -Needs Cleaning.csv'
-WVSOS_PROCESSED_PATH = PROCESSED_DATA_DIR / 'wvsos_processed.csv'
+WVSOS_PROCESSED_PATH = PROCESSED_DATA_DIR / 'processed_wvsos.csv'
 WVSOS_FINAL_PATH = FINAL_DATA_DIR / 'wvsos_final.csv'
 
 # Global Settings
