@@ -11,10 +11,15 @@ RAW_DATA_DIR = DATA_DIR / 'raw'
 PROCESSED_DATA_DIR = DATA_DIR / 'processed'
 FINAL_DATA_DIR = DATA_DIR / 'final'
 
-# File Paths
+# WVSOS File Paths
 WVSOS_RAW_PATH = RAW_DATA_DIR / 'WVSOS Business Registrations Complete Data -Needs Cleaning.csv'
 WVSOS_PROCESSED_PATH = PROCESSED_DATA_DIR / 'processed_wvsos.csv'
 WVSOS_FINAL_PATH = FINAL_DATA_DIR / 'wvsos_final.csv'
+
+# BEA File Paths
+BEA_RAW_PATH = RAW_DATA_DIR / 'SAGDP9_WV_1997_2024.csv'
+BEA_PROCESSED_PATH = PROCESSED_DATA_DIR / 'processed_bea.csv'
+BEA_FINAL_PATH = FINAL_DATA_DIR / 'bea_final.csv'
 
 # Global Settings
 START_YEAR = 2006
