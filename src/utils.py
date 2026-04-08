@@ -1,6 +1,5 @@
 # Imports
 import pandas as pd
-
 from src.config import START_YEAR, END_YEAR
 from src.config import CSV_EXPORT_KWARGS
 
@@ -16,6 +15,7 @@ def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = (
         df.columns
         .str.strip()
+        .str.replace(r'(?<!^)(?=[A-Z])', '_', regex=True)
         .str.lower()
         .str.replace(' ', '_')
         .str.replace(r'[^\w_]', '', regex=True)
@@ -103,6 +103,60 @@ def map_naics_to_industry(df: pd.DataFrame, naics_col='naics', industry_col='ind
     df = df.copy()
     df[industry_col] = df[naics_col].apply(mapper)
     print('NAICS mapped to BLS/BEA industries.')
+    return df
+
+
+# BEA industry mapping
+def map_bea_industries(df: pd.DataFrame, column: str = 'description') -> pd.DataFrame:
+    """Map BEA industry descriptions to standardized industry categories consistent with BLS/WVSOS classifications."""
+    bea_mapping = {
+        # Top level total
+        'all industry total': 'Total Nonfarm',
+        # Mining / Logging
+        'farms': 'Mining and Logging',
+        'forestry, fishing, and related activities': 'Mining and Logging',
+        'oil and gas extraction': 'Mining and Logging',
+        'mining (except oil and gas)': 'Mining and Logging',
+        'support activities for mining': 'Mining and Logging',
+        # Trade / Transportation / Utilities
+        'utilities': 'Trade, Transportation, and Utilities',
+        'wholesale trade': 'Trade, Transportation, and Utilities',
+        'retail trade': 'Trade, Transportation, and Utilities',
+        'transportation and warehousing': 'Trade, Transportation, and Utilities',
+        # Construction
+        'construction': 'Construction',
+        # Manufacturing
+        'manufacturing': 'Manufacturing',
+        # Information
+        'information': 'Information',
+        # Finance / Insurance
+        'finance and insurance': 'Finance and Insurance',
+        # Real Estate / Rental / Leasing
+        'real estate': 'Real Estate and Rental and Leasing',
+        'rental and leasing services and lessors of nonfinancial intangible assets': 'Real Estate and Rental and Leasing',
+        # Professional / Business Services
+        'professional, scientific, and technical services': 'Professional and Business Services',
+        'management of companies and enterprises': 'Professional and Business Services',
+        'administrative and support and waste management and remediation services': 'Professional and Business Services',
+        # Educational Services
+        'educational services': 'Private Educational Services',
+        # Health Care / Social Assistance
+        'health care and social assistance': 'Health Care and Social Assistance',
+        # Leisure / Hospitality
+        'arts, entertainment, and recreation': 'Leisure and Hospitality',
+        'accommodation and food services': 'Leisure and Hospitality',
+        # Other Services
+        'other services (except government and government enterprises)': 'Other Services',
+        # Government
+        'government and government enterprises': 'Government',
+    }
+
+    # Normalize text
+    df[column] = df[column].str.strip().str.lower()
+
+    # Apply mapping
+    df['industry'] = df[column].map(bea_mapping).fillna('Other / Unknown')
+    print(f"Mapped {len(bea_mapping)} BEA industries to standardized categories.")
     return df
 
 

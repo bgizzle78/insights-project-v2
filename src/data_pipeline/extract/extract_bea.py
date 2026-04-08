@@ -15,7 +15,6 @@ def load_bea_data():
         print(f'File not found: {BEA_RAW_PATH}')
         raise
 
-
 # Select Relevant Columns
 def select_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Keep only relevant columns for analysis (WV 2006-2025)."""
@@ -33,9 +32,7 @@ def select_columns(df: pd.DataFrame) -> pd.DataFrame:
     columns = base_columns + year_cols
     df = df[columns]
     print(f'Selected relevant columns: {len(columns)} columns remaining')
-
     return df
-
 
 # Clean Data
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -44,7 +41,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     print('Standardized column names')
 
     # Drop rows missing key identifiers (footnotes)
-    df = df.dropna(subset=['geoname', 'linecode', 'industryclassification', 'description'])
+    df = df.dropna(subset=['geo_name', 'line_code', 'industry_classification', 'description'])
     print(f'Dropped rows with missing key identifiers. Remaining rows: {len(df)}')
     
     # Identify year columns that actually exist in the DataFrame
@@ -53,22 +50,19 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     # Convert these year columns to numeric
     for col in year_cols:
         df[col] = pd.to_numeric(df[col], errors='coerce')
-    print(f'Converted year columns {year_cols[0]}–{year_cols[-1]} to numeric')
+    print(f'Converted year columns {year_cols[0]}-{year_cols[-1]} to numeric')
     
     # Print NA summary for awareness
     na_counts = df[year_cols].isna().sum()
     print('Missing values per year column:')
     print(na_counts)
-    
     return df
-
 
 # Save Processed Data
 def save_processed_data(df: pd.DataFrame):
     """Save the processed BEA dataset."""
     save_csv(df, BEA_PROCESSED_PATH)
     print(f'Saved processed data to {BEA_PROCESSED_PATH}')
-
 
 # Main Pipeline
 def main():
@@ -78,7 +72,6 @@ def main():
     df = clean_data(df)
     save_processed_data(df)
     print('\nBEA extract step complete. Processed data saved.')
-
 
 # Run Script
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 # Imports
 import pandas as pd
-from pathlib import Path
 from typing import Tuple
 from src.config import WVSOS_PROCESSED_PATH, WVSOS_FINAL_PATH, START_YEAR, END_YEAR
 from src.utils import filter_year_range, add_year_columns, fill_unknown, save_csv, calculate_active_orgs, map_naics_to_industry
@@ -35,7 +34,6 @@ def filter_and_clean(df: pd.DataFrame) -> pd.DataFrame:
     print('Standardized NAICS missing values to unknown')
     return df
 
-
 # Extract Year Columns
 def add_year_cols(df: pd.DataFrame) -> pd.DataFrame:
     """Add filing_year and termination_year columns."""
@@ -43,8 +41,7 @@ def add_year_cols(df: pd.DataFrame) -> pd.DataFrame:
     print('Added filing_year and termination_year columns')
     return df
 
-
-# Map NAICS to WVSOS Industries
+# Map NAICS to WVSOS industries
 def map_industries(df: pd.DataFrame) -> pd.DataFrame:
     """Map NAICS codes to BLS/BEA industry categories."""
     df = map_naics_to_industry(df, naics_col='naics', industry_col='industry')
