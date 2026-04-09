@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 # Constants (file paths)
-BASE_DIR = Path(__file__).resolve().parents[2]
+BASE_DIR = Path(__file__).resolve().parents[3]
 
 BLS_EMPLOYMENT_CLEAN_PATH = BASE_DIR / 'data' / 'processed' / 'processed_bls_employment.csv'
 BLS_UNEMPLOYMENT_CLEAN_PATH = BASE_DIR / 'data' / 'processed' / 'processed_bls_unemployment.csv'
@@ -162,8 +162,8 @@ def save_data(df: pd.DataFrame, output_path: Path):
 # Main Function: transform_bls_employment
 def transform_bls_employment():
     df = load_data(BLS_EMPLOYMENT_CLEAN_PATH)
-
     df = map_series_to_industry(df)
+    df = df[df['industry'] != 'Total Nonfarm']
     df = filter_relevant_data(df)
     df = aggregate_employment(df)
 

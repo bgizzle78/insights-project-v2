@@ -6,20 +6,28 @@ from src.config import CSV_EXPORT_KWARGS
 
 # Column Cleaning
 def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
-    """Standardizes column names:
+    """Standardizes column names safely:
     - lowercase
     - replaces spaces with underscores
+    - replaces camelCase with underscores
+    - collapses multiple underscores into single underscore
     - removes special characters"""
 
     df = df.copy()
     df.columns = (
         df.columns
-        .str.strip()
-        .str.replace(r'(?<!^)(?=[A-Z])', '_', regex=True)
+        .str.strip()                           # remove leading/trailing spaces
+        .str.replace(r'\s+', ' ', regex=True)  # normalize multiple spaces
+        .str.replace(r'(?<!^)(?=[A-Z])', '_', regex=True)  # camelCase → underscores
         .str.lower()
-        .str.replace(' ', '_')
-        .str.replace(r'[^\w_]', '', regex=True)
+        .str.replace(' ', '_')                  # replace spaces with underscore
+        .str.replace(r'_+', '_', regex=True)    # collapse multiple underscores into single _
+        .str.replace(r'[^\w_]', '', regex=True) # remove special chars
     )
+
+    # Fix n_a_i_c_s column
+    if 'n_a_i_c_s' in df.columns:
+        df = df.rename(columns={'n_a_i_c_s': 'naics'})
     return df
 
 
@@ -65,12 +73,12 @@ def add_year_columns(df: pd.DataFrame, date_columns: dict) -> pd.DataFrame:
     return df
 
 
-# WVSOS Industry Mapping
+# WVSOS industry mapping
 def map_naics_to_industry(df: pd.DataFrame, naics_col='naics', industry_col='industry') -> pd.DataFrame:
-    """Maps 2-digit NAICS codes to BLS/BEA industries."""
+    """Maps 2-digit NAICS codes to BLS industries."""
     def mapper(sector):
         if pd.isna(sector) or str(sector).lower() == 'unknown':
-            return 'Unmapped'
+            return 'Unknown Industry'
         sector = str(int(sector))[:2]  # Convert to string and get first 2 digits
         if sector in ['21', '11']:
             return 'Mining and Logging'
@@ -89,7 +97,7 @@ def map_naics_to_industry(df: pd.DataFrame, naics_col='naics', industry_col='ind
         elif sector in ['54', '55', '56']:
             return 'Professional and Business Services'
         elif sector == '61':
-            return 'Private Education Services'
+            return 'Private Educational Services'
         elif sector == '62':
             return 'Health Care and Social Assistance'
         elif sector in ['71', '72']:
@@ -102,7 +110,7 @@ def map_naics_to_industry(df: pd.DataFrame, naics_col='naics', industry_col='ind
             return 'Unknown Industry'
     df = df.copy()
     df[industry_col] = df[naics_col].apply(mapper)
-    print('NAICS mapped to BLS/BEA industries.')
+    print('WVSOS NAICS mapped to BLS industries.')
     return df
 
 
@@ -110,8 +118,8 @@ def map_naics_to_industry(df: pd.DataFrame, naics_col='naics', industry_col='ind
 def map_bea_industries(df: pd.DataFrame, column: str = 'description') -> pd.DataFrame:
     """Map BEA industry descriptions to standardized industry categories consistent with BLS/WVSOS classifications."""
     bea_mapping = {
-        # Top level total
-        'all industry total': 'Total Nonfarm',
+        # # Top level total
+        # 'all industry total': 'Total Nonfarm',
         # Mining / Logging
         'farms': 'Mining and Logging',
         'forestry, fishing, and related activities': 'Mining and Logging',
@@ -163,7 +171,7 @@ def map_bea_industries(df: pd.DataFrame, column: str = 'description') -> pd.Data
 # Save CSV Standardized
 def save_csv(df: pd.DataFrame, path) -> None:
     """Saves dataframe to CSV with standardized settings."""
-    df.to_csv(path, **CSV_EXPORT_KWARGS)
+    df.to_csv(path, **CSV_EXPORT_KWARGS, quoting=2)
 
 
 # Cumulative Active Calculation

@@ -4,7 +4,7 @@ from pathlib import Path
 
 # Constants (file paths to raw and processed data)
 # Project root (go up from this file -> src/data_pipeline -> project root)
-BASE_DIR = Path(__file__).resolve().parents[2]
+BASE_DIR = Path(__file__).resolve().parents[3]
 
 BLS_EMPLOYMENT_RAW_PATH = BASE_DIR / 'data' / 'raw' / 'bls_employment.csv'
 BLS_EMPLOYMENT_PROCESSED_PATH = BASE_DIR / 'data' / 'processed' / 'processed_bls_employment.csv'

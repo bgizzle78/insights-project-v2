@@ -30,3 +30,20 @@ CSV_EXPORT_KWARGS = {
     'index': False,
     'encoding': 'utf-8'
 }
+
+# Canonical Industry List
+STANDARD_INDUSTRIES = [
+    'Mining and Logging',
+    'Construction',
+    'Manufacturing',
+    'Trade, Transportation, and Utilities',
+    'Information',
+    'Finance and Insurance',
+    'Real Estate and Rental and Leasing',
+    'Professional and Business Services',
+    'Private Educational Services',
+    'Health Care and Social Assistance',
+    'Leisure and Hospitality',
+    'Other Services',
+    'Government'
+]

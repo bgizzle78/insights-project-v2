@@ -1,21 +1,281 @@
-year,new_filings,terminations,active_orgs
-2006,9935,97,9838
-2007,10215,1518,18535
-2008,9770,3593,24712
-2009,9547,3389,30870
-2010,9612,4534,35948
-2011,10211,4379,41780
-2012,10825,5049,47556
-2013,11356,5343,53569
-2014,11743,5656,59656
-2015,11404,7966,63094
-2016,11887,7682,67299
-2017,11966,2583,76682
-2018,12981,2932,86731
-2019,13194,3180,96745
-2020,13529,9500,100774
-2021,16546,8006,109314
-2022,16976,8784,117506
-2023,18047,8943,126610
-2024,18298,11883,133025
-2025,19657,2541,150141
+"year","industry","new_filings","terminations"
+2006,"Mining and Logging",248,0
+2006,"Construction",698,0
+2006,"Manufacturing",213,0
+2006,"Trade, Transportation, and Utilities",619,0
+2006,"Information",93,0
+2006,"Finance and Insurance",272,2
+2006,"Real Estate and Rental and Leasing",779,0
+2006,"Professional and Business Services",642,1
+2006,"Private Educational Services",82,0
+2006,"Health Care and Social Assistance",213,0
+2006,"Leisure and Hospitality",241,0
+2006,"Other Services",385,0
+2006,"Government",17,0
+2006,"Unknown Industry",5433,94
+2007,"Mining and Logging",253,2
+2007,"Construction",610,7
+2007,"Manufacturing",277,3
+2007,"Trade, Transportation, and Utilities",619,17
+2007,"Information",106,2
+2007,"Finance and Insurance",324,2
+2007,"Real Estate and Rental and Leasing",857,7
+2007,"Professional and Business Services",679,11
+2007,"Private Educational Services",91,0
+2007,"Health Care and Social Assistance",247,1
+2007,"Leisure and Hospitality",236,8
+2007,"Other Services",417,11
+2007,"Government",22,0
+2007,"Unknown Industry",5477,1447
+2008,"Mining and Logging",294,15
+2008,"Construction",637,45
+2008,"Manufacturing",265,9
+2008,"Trade, Transportation, and Utilities",645,100
+2008,"Information",109,7
+2008,"Finance and Insurance",307,27
+2008,"Real Estate and Rental and Leasing",808,42
+2008,"Professional and Business Services",726,72
+2008,"Private Educational Services",80,14
+2008,"Health Care and Social Assistance",204,17
+2008,"Leisure and Hospitality",247,22
+2008,"Other Services",407,80
+2008,"Government",19,1
+2008,"Unknown Industry",5022,3142
+2009,"Mining and Logging",337,12
+2009,"Construction",676,64
+2009,"Manufacturing",260,15
+2009,"Trade, Transportation, and Utilities",797,87
+2009,"Information",111,22
+2009,"Finance and Insurance",301,27
+2009,"Real Estate and Rental and Leasing",724,40
+2009,"Professional and Business Services",802,103
+2009,"Private Educational Services",86,9
+2009,"Health Care and Social Assistance",227,20
+2009,"Leisure and Hospitality",271,34
+2009,"Other Services",555,53
+2009,"Government",21,3
+2009,"Unknown Industry",4379,2900
+2010,"Mining and Logging",362,32
+2010,"Construction",828,87
+2010,"Manufacturing",254,37
+2010,"Trade, Transportation, and Utilities",887,151
+2010,"Information",131,16
+2010,"Finance and Insurance",327,32
+2010,"Real Estate and Rental and Leasing",825,70
+2010,"Professional and Business Services",845,159
+2010,"Private Educational Services",111,16
+2010,"Health Care and Social Assistance",254,43
+2010,"Leisure and Hospitality",359,69
+2010,"Other Services",568,146
+2010,"Government",20,0
+2010,"Unknown Industry",3841,3676
+2011,"Mining and Logging",347,33
+2011,"Construction",895,119
+2011,"Manufacturing",303,29
+2011,"Trade, Transportation, and Utilities",1018,215
+2011,"Information",149,15
+2011,"Finance and Insurance",328,27
+2011,"Real Estate and Rental and Leasing",890,87
+2011,"Professional and Business Services",997,196
+2011,"Private Educational Services",124,22
+2011,"Health Care and Social Assistance",253,36
+2011,"Leisure and Hospitality",382,81
+2011,"Other Services",582,176
+2011,"Government",29,2
+2011,"Unknown Industry",3914,3341
+2012,"Mining and Logging",454,41
+2012,"Construction",890,165
+2012,"Manufacturing",374,47
+2012,"Trade, Transportation, and Utilities",1109,284
+2012,"Information",193,15
+2012,"Finance and Insurance",337,23
+2012,"Real Estate and Rental and Leasing",1073,117
+2012,"Professional and Business Services",1147,239
+2012,"Private Educational Services",144,40
+2012,"Health Care and Social Assistance",321,57
+2012,"Leisure and Hospitality",435,100
+2012,"Other Services",668,222
+2012,"Government",26,1
+2012,"Unknown Industry",3654,3698
+2013,"Mining and Logging",555,50
+2013,"Construction",944,176
+2013,"Manufacturing",393,35
+2013,"Trade, Transportation, and Utilities",1292,330
+2013,"Information",222,21
+2013,"Finance and Insurance",388,28
+2013,"Real Estate and Rental and Leasing",1233,119
+2013,"Professional and Business Services",1175,225
+2013,"Private Educational Services",184,32
+2013,"Health Care and Social Assistance",312,78
+2013,"Leisure and Hospitality",545,130
+2013,"Other Services",794,210
+2013,"Government",30,4
+2013,"Unknown Industry",3289,3905
+2014,"Mining and Logging",682,61
+2014,"Construction",973,188
+2014,"Manufacturing",429,58
+2014,"Trade, Transportation, and Utilities",1439,379
+2014,"Information",259,32
+2014,"Finance and Insurance",433,44
+2014,"Real Estate and Rental and Leasing",1337,141
+2014,"Professional and Business Services",1320,276
+2014,"Private Educational Services",151,52
+2014,"Health Care and Social Assistance",388,53
+2014,"Leisure and Hospitality",606,155
+2014,"Other Services",852,276
+2014,"Government",33,1
+2014,"Unknown Industry",2841,3940
+2015,"Mining and Logging",520,131
+2015,"Construction",967,336
+2015,"Manufacturing",420,98
+2015,"Trade, Transportation, and Utilities",1479,609
+2015,"Information",225,63
+2015,"Finance and Insurance",411,82
+2015,"Real Estate and Rental and Leasing",1303,280
+2015,"Professional and Business Services",1307,471
+2015,"Private Educational Services",153,59
+2015,"Health Care and Social Assistance",370,117
+2015,"Leisure and Hospitality",573,219
+2015,"Other Services",840,450
+2015,"Government",33,7
+2015,"Unknown Industry",2803,5044
+2016,"Mining and Logging",573,347
+2016,"Construction",1133,644
+2016,"Manufacturing",434,229
+2016,"Trade, Transportation, and Utilities",1673,997
+2016,"Information",232,157
+2016,"Finance and Insurance",401,187
+2016,"Real Estate and Rental and Leasing",1434,495
+2016,"Professional and Business Services",1316,871
+2016,"Private Educational Services",199,104
+2016,"Health Care and Social Assistance",367,192
+2016,"Leisure and Hospitality",694,402
+2016,"Other Services",956,586
+2016,"Government",39,17
+2016,"Unknown Industry",2436,2454
+2017,"Mining and Logging",528,105
+2017,"Construction",1123,169
+2017,"Manufacturing",414,71
+2017,"Trade, Transportation, and Utilities",1635,381
+2017,"Information",209,59
+2017,"Finance and Insurance",376,112
+2017,"Real Estate and Rental and Leasing",1316,293
+2017,"Professional and Business Services",1319,296
+2017,"Private Educational Services",179,24
+2017,"Health Care and Social Assistance",415,91
+2017,"Leisure and Hospitality",691,133
+2017,"Other Services",974,175
+2017,"Government",37,7
+2017,"Unknown Industry",2750,667
+2018,"Mining and Logging",569,128
+2018,"Construction",1122,181
+2018,"Manufacturing",434,102
+2018,"Trade, Transportation, and Utilities",1595,436
+2018,"Information",243,66
+2018,"Finance and Insurance",439,117
+2018,"Real Estate and Rental and Leasing",1510,329
+2018,"Professional and Business Services",1400,385
+2018,"Private Educational Services",200,44
+2018,"Health Care and Social Assistance",400,95
+2018,"Leisure and Hospitality",647,181
+2018,"Other Services",963,232
+2018,"Government",44,10
+2018,"Unknown Industry",3415,626
+2019,"Mining and Logging",586,135
+2019,"Construction",1181,196
+2019,"Manufacturing",543,114
+2019,"Trade, Transportation, and Utilities",1821,449
+2019,"Information",290,73
+2019,"Finance and Insurance",482,122
+2019,"Real Estate and Rental and Leasing",1555,314
+2019,"Professional and Business Services",1445,401
+2019,"Private Educational Services",239,42
+2019,"Health Care and Social Assistance",418,88
+2019,"Leisure and Hospitality",704,135
+2019,"Other Services",1147,223
+2019,"Government",36,4
+2019,"Unknown Industry",2747,884
+2020,"Mining and Logging",562,396
+2020,"Construction",1285,749
+2020,"Manufacturing",472,229
+2020,"Trade, Transportation, and Utilities",1937,1341
+2020,"Information",276,158
+2020,"Finance and Insurance",499,209
+2020,"Real Estate and Rental and Leasing",1622,631
+2020,"Professional and Business Services",1575,842
+2020,"Private Educational Services",166,127
+2020,"Health Care and Social Assistance",440,290
+2020,"Leisure and Hospitality",732,531
+2020,"Other Services",1252,741
+2020,"Government",26,21
+2020,"Unknown Industry",2685,3235
+2021,"Mining and Logging",569,360
+2021,"Construction",1456,668
+2021,"Manufacturing",506,257
+2021,"Trade, Transportation, and Utilities",2371,1129
+2021,"Information",288,143
+2021,"Finance and Insurance",567,209
+2021,"Real Estate and Rental and Leasing",2130,681
+2021,"Professional and Business Services",1720,784
+2021,"Private Educational Services",212,111
+2021,"Health Care and Social Assistance",506,213
+2021,"Leisure and Hospitality",912,455
+2021,"Other Services",1572,626
+2021,"Government",35,25
+2021,"Unknown Industry",3702,2345
+2022,"Mining and Logging",556,300
+2022,"Construction",1361,542
+2022,"Manufacturing",534,196
+2022,"Trade, Transportation, and Utilities",2071,1005
+2022,"Information",325,120
+2022,"Finance and Insurance",683,188
+2022,"Real Estate and Rental and Leasing",2062,643
+2022,"Professional and Business Services",1728,739
+2022,"Private Educational Services",215,123
+2022,"Health Care and Social Assistance",566,197
+2022,"Leisure and Hospitality",901,412
+2022,"Other Services",1627,597
+2022,"Government",37,11
+2022,"Unknown Industry",4310,3711
+2023,"Mining and Logging",574,332
+2023,"Construction",1469,705
+2023,"Manufacturing",547,245
+2023,"Trade, Transportation, and Utilities",2146,1236
+2023,"Information",306,155
+2023,"Finance and Insurance",550,276
+2023,"Real Estate and Rental and Leasing",1984,782
+2023,"Professional and Business Services",1888,891
+2023,"Private Educational Services",297,113
+2023,"Health Care and Social Assistance",543,273
+2023,"Leisure and Hospitality",967,443
+2023,"Other Services",1798,824
+2023,"Government",40,19
+2023,"Unknown Industry",4938,2649
+2024,"Mining and Logging",490,452
+2024,"Construction",1458,1056
+2024,"Manufacturing",442,331
+2024,"Trade, Transportation, and Utilities",1996,1715
+2024,"Information",263,208
+2024,"Finance and Insurance",454,326
+2024,"Real Estate and Rental and Leasing",1536,1027
+2024,"Professional and Business Services",1793,1158
+2024,"Private Educational Services",334,146
+2024,"Health Care and Social Assistance",491,369
+2024,"Leisure and Hospitality",859,681
+2024,"Other Services",1806,1096
+2024,"Government",30,26
+2024,"Unknown Industry",6346,3292
+2025,"Mining and Logging",323,78
+2025,"Construction",1502,173
+2025,"Manufacturing",320,93
+2025,"Trade, Transportation, and Utilities",1697,375
+2025,"Information",191,50
+2025,"Finance and Insurance",333,114
+2025,"Real Estate and Rental and Leasing",1307,302
+2025,"Professional and Business Services",1602,360
+2025,"Private Educational Services",252,29
+2025,"Health Care and Social Assistance",504,87
+2025,"Leisure and Hospitality",706,158
+2025,"Other Services",1867,226
+2025,"Government",11,3
+2025,"Unknown Industry",9042,493
