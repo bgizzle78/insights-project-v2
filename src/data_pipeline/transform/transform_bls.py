@@ -22,7 +22,6 @@ def load_data(filepath: Path) -> pd.DataFrame:
         print(f'File not found: {filepath}')
         raise
 
-
 # Function: map_series_to_industry (series id -> industry name)
 def map_series_to_industry(df: pd.DataFrame) -> pd.DataFrame:
     """Replace series_id with human-readable industry names (YOU will define the mapping dictionary)"""
@@ -46,9 +45,7 @@ def map_series_to_industry(df: pd.DataFrame) -> pd.DataFrame:
 }
 
     df['industry'] = df['series_id'].map(series_map)
-
     print(df[['series_id', 'industry']].drop_duplicates())
-
     return df
 
 # Function: filter_relevant_data
@@ -69,16 +66,12 @@ def filter_relevant_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # Sanity checks (no filtering)
     print(f'Unique series count: {df["series_id"].nunique()}')
-
     if 'industry' in df.columns:
         print(f'Industries present: {df["industry"].nunique()}')
 
     print(f'Date range: {df["date"].min()} to {df["date"].max()}')
-
     print(df.columns)
-    
     print(df.head())
-
     return df
 
 # Function: aggregate_employment
@@ -97,16 +90,14 @@ def aggregate_employment(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Rename for clarity
-    df = df.rename(columns={'value': 'avg_employment'})
+    df = df.rename(columns={'value': 'employment'})
 
     # Multiply by 1000 to get readable employment numbers
-    df['avg_employment'] = (df['avg_employment'] * 1000).round().astype(int)
+    df['employment'] = (df['employment'] * 1000).round().astype(int)
 
     df = df.sort_values(['industry', 'year'])
-
     print(df.head(10))
     print(df.columns)
-
     return df
 
 # Function: aggregate_unemployment
@@ -150,14 +141,12 @@ def aggregate_unemployment(df: pd.DataFrame) -> pd.DataFrame:
 
     return df_wide
 
-
 # Function: save_data
 def save_data(df: pd.DataFrame, output_path: Path):
     """Save transformed data"""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(output_path, index=False)
     print(f'Saved data to {output_path}')
-
 
 # Main Function: transform_bls_employment
 def transform_bls_employment():
@@ -166,18 +155,14 @@ def transform_bls_employment():
     df = df[df['industry'] != 'Total Nonfarm']
     df = filter_relevant_data(df)
     df = aggregate_employment(df)
-
     save_data(df, BLS_EMPLOYMENT_FINAL_PATH)
 
 # Main Function: transform_bls_unemployment
 def transform_bls_unemployment():
     df = load_data(BLS_UNEMPLOYMENT_CLEAN_PATH)
-
     df = filter_relevant_data(df)
     df = aggregate_unemployment(df)
-
     save_data(df, BLS_UNEMPLOYMENT_FINAL_PATH)
-
 
 # Run script
 if __name__ == '__main__':
