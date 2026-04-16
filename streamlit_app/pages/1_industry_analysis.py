@@ -97,6 +97,7 @@ with card1:
         padding: 18px;
         border-radius: 14px;
         height: 130px;
+        line-height: 1.1;
     ">
         <div style="font-size: 24px; opacity: 0.7;">Total Employment</div>
         <div style="font-size: 30px; font-weight: 700; margin-top: 10px;">
@@ -115,6 +116,7 @@ with card2:
         padding: 18px;
         border-radius: 14px;
         height: 130px;
+        line-height: 1.1;
     ">
         <div style="font-size: 24px; opacity: 0.7;">Total GDP</div>
         <div style="font-size: 30px; font-weight: 700; margin-top: 10px; color: #2ecc71;">
@@ -132,6 +134,7 @@ with card3:
         padding: 18px;
         border-radius: 14px;
         height: 130px;
+        line-height: 1.1;
     ">
         <div style="font-size: 24px; opacity: 0.7;">GDP per Worker</div>
         <div style="font-size: 30px; font-weight: 700; margin-top: 10px;">
@@ -232,8 +235,9 @@ with tab2:
             padding: 12px;
             border-radius: 12px;
             height: 140px;
+            line-height: 1.1;
         ">
-            <div style="font-size: 14px; opacity: 0.7;">Industry</div>
+            <div style="font-size: 20px; opacity: 0.7;">Industry</div>
             <div style="font-size: 18px; font-weight: 600; line-height: 1.3; white-space: normal; overflow-wrap: break-word;">
                 {top['industry']}
             </div>
@@ -247,8 +251,9 @@ with tab2:
             padding: 12px;
             border-radius: 12px;
             height: 140px;
+            line-height: 1.1;
         ">
-            <div style="font-size: 14px; opacity: 0.7;">GDP</div>
+            <div style="font-size: 20px; opacity: 0.7;">GDP</div>
             <div style="font-size: 26px; font-weight: 700; color: #2ecc71;">
                 ${top['gdp']/1_000:,.2f}B
             </div>
@@ -262,8 +267,9 @@ with tab2:
             padding: 12px;
             border-radius: 12px;
             height: 140px;
+            line-height: 1.1;
         ">
-            <div style="font-size: 14px; opacity: 0.7;">Employment</div>
+            <div style="font-size: 20px; opacity: 0.7;">Employment</div>
             <div style="font-size: 26px; font-weight: 700;">
                 {top['employment']:,.0f}
             </div>
@@ -280,8 +286,9 @@ with tab2:
             padding: 12px;
             border-radius: 12px;
             height: 140px;
+            line-height: 1.1;
         ">
-            <div style="font-size: 14px; opacity: 0.7;">Net Business Growth</div>
+            <div style="font-size: 20px; opacity: 0.7;">Net Growth</div>
             <div style="font-size: 26px; font-weight: 700; color: {color};">
                 {net:,.0f}
             </div>
@@ -370,10 +377,10 @@ fig_gdp = go.Figure()
 
 fig_gdp.add_trace(go.Scatter(
     x=df_trend['year'],
-    y=df_trend['gdp_billions'],
+    y=df_trend['gdp'] / 1000,
     mode='lines+markers',
     name='GDP',
-    hovertemplate='Year: %{x}<br>GDP: %{y:,.2f}B<extra></extra>'
+    hovertemplate='Year: %{x}<br>GDP: $%{y:,.2f}B<extra></extra>'
 ))
 
 fig_gdp.update_layout(
@@ -399,7 +406,7 @@ fig.add_trace(
         name='Employment',
         yaxis='y1',
         mode='lines+markers',
-        hovertemplate='Year: %{x}<br>Employment: %{y:,.1f}<extra></extra>'
+        hovertemplate='Year: %{x}<br>Employment: %{y:,.1f}K<extra></extra>'
     )
 )
 
@@ -407,11 +414,11 @@ fig.add_trace(
 fig.add_trace(
     go.Scatter(
         x=df_trend['year'],
-        y=df_trend['gdp_billions'],
+        y=df_trend['gdp'] / 1000,
         name='GDP (Billions)',
         yaxis='y2',
         mode='lines+markers',
-        hovertemplate='Year: %{x}<br>GDP: $%{y:,.2f}M<extra></extra>'
+        hovertemplate='Year: %{x}<br>GDP: $%{y:,.2f}B<extra></extra>'
     )
 )
 

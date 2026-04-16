@@ -14,7 +14,7 @@ import streamlit as st
 from data_loader import load_economic_data, load_unemployment_data
 
 # =====================================
-# PAGE CONFIG
+# PAGE TITLE
 # =====================================
 st.title('📈 Economic Trends')
 
@@ -39,21 +39,64 @@ df_trend = (
 )
 
 # =====================================
-# KPIs
+# KPI CARDS (GLOBAL STYLE)
 # =====================================
 st.subheader('📊 Statewide Overview')
 
-total_employment = df_trend['employment'].sum()
-total_gdp = df_trend['gdp'].sum()
-total_filings = df_trend['new_filings'].sum()
-total_terminations = df_trend['terminations'].sum()
+latest = df_trend.sort_values('year').iloc[-1]
+latest_unemp = df_unemp.sort_values('year').iloc[-1]['unemployment_rate']
 
-col1, col2, col3, col4 = st.columns(4)
+total_employment = latest['employment']
+total_gdp = latest['gdp']
+net_business_growth = latest['new_filings'] - latest['terminations']
 
-col1.metric('Employment', f'{total_employment:,.0f}')
-col2.metric('GDP', f'${total_gdp:,.0f}')
-col3.metric('New Filings', f'{total_filings:,.0f}')
-col4.metric('Terminations', f'{total_terminations:,.0f}')
+cols = st.columns(4)
+
+# ---- Employment ----
+with cols[0]:
+    st.markdown(f'''
+    <div style="background-color:#1f1f1f;padding:18px;border-radius:14px;height:130px;line-height: 1.1;">
+        <div style="font-size:22px;opacity:0.7;">Employment</div>
+        <div style="font-size:28px;font-weight:700;margin-top:10px;">
+            {int(total_employment):,}
+        </div>
+    </div>
+    ''', unsafe_allow_html=True)
+
+# ---- GDP ----
+with cols[1]:
+    st.markdown(f'''
+    <div style="background-color:#1f1f1f;padding:18px;border-radius:14px;height:130px;line-height: 1.1;">
+        <div style="font-size:22px;opacity:0.7;">GDP</div>
+        <div style="font-size:28px;font-weight:700;margin-top:10px;color:#4CAF50;">
+            ${int(total_gdp):,}
+        </div>
+    </div>
+    ''', unsafe_allow_html=True)
+
+# ---- Net Business Growth ----
+with cols[2]:
+    color = '#4CAF50' if net_business_growth >= 0 else '#FF6B6B'
+
+    st.markdown(f'''
+    <div style="background-color:#1f1f1f;padding:18px;border-radius:14px;height:130px;line-height: 1.1;">
+        <div style="font-size:22px;opacity:0.7;">Net Growth</div>
+        <div style="font-size:28px;font-weight:700;margin-top:10px;color:{color};">
+            {int(net_business_growth):,}
+        </div>
+    </div>
+    ''', unsafe_allow_html=True)
+
+# ---- Unemployment ----
+with cols[3]:
+    st.markdown(f'''
+    <div style="background-color:#1f1f1f;padding:18px;border-radius:14px;height:130px;line-height: 1.1;">
+        <div style="font-size:20px;opacity:0.7;">Unemployment Rate</div>
+        <div style="font-size:28px;font-weight:700;margin-top:10px;color:#FF6B6B;">
+            {latest_unemp:.2f}%
+        </div>
+    </div>
+    ''', unsafe_allow_html=True)
 
 # =====================================
 # CHARTS
