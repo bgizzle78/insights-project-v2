@@ -12,6 +12,11 @@ sys.path.append(str(ROOT_DIR))
 # =====================================
 import streamlit as st
 from utils.data_loader import load_economic_data
+from utils.metrics import (
+    add_growth_metrics,
+    add_business_metrics,
+    add_share_metrics
+)
 import plotly.graph_objects as go
 
 # =====================================
@@ -23,6 +28,9 @@ st.title('📊 Industry Analysis')
 # LOAD DATA
 # =====================================
 df = load_economic_data()
+df = add_growth_metrics(df)
+df = add_business_metrics(df)
+df = add_share_metrics(df)
 
 # =====================================
 # FILTER BAR (IMPROVED UX)
@@ -75,6 +83,12 @@ df_filtered = df[
     (df['industry'].isin(selected_industries)) &
     (df['year'].between(selected_years[0], selected_years[1]))
 ]
+
+# =====================================
+# VIEW MODE DETECTION
+# =====================================
+
+is_single_year = selected_years[0] == selected_years[1]
 
 # =====================================
 # KPI CARDS (GLOBAL STYLE)
@@ -205,12 +219,30 @@ with tab2:
     }).reset_index()
 
     summary['net_business'] = summary['new_filings'] - summary['terminations']
+    summary['employment_share'] = summary['employment'] / summary['employment'].sum()
 
     summary['gdp_per_worker'] = (
         (summary['gdp'] * 1_000_000) / summary['employment']
     )
 
-    summary = summary.sort_values('gdp', ascending=False)
+    summary['importance_score'] = (
+    summary['employment_share'] * 0.5 +
+    (summary['gdp_per_worker'] / summary['gdp_per_worker'].max()) * 0.5
+)
+    
+    summary = summary[[
+        'industry',
+        'employment',
+        'employment_share',
+        'gdp',
+        'gdp_per_worker',
+        'new_filings',
+        'terminations',
+        'net_business',
+        'importance_score'
+    ]]
+
+    summary = summary.sort_values('importance_score', ascending=False)
 
     # ---- CLEAN DISPLAY COPY ----
     summary_display = summary.copy()
@@ -222,7 +254,7 @@ with tab2:
     )
 
     # ---- KPI CARDS ----
-    top = summary.iloc[0]
+    top = summary.sort_values('importance_score', ascending=False).iloc[0]
 
     st.markdown('### 🏆 Top Performing Industry')
 
@@ -304,7 +336,9 @@ with tab2:
     'Employment': '{:,.0f}',
     'New Filings': '{:,.0f}',
     'Terminations': '{:,.0f}',
-    'Net Business': '{:,.0f}'
+    'Net Business': '{:,.0f}',
+    'Employment Share': '{:,.1%}',
+    'Importance Score': '{:,.2f}'
 }
     styled_summary = summary_display.style.format(format_dict)
 
@@ -329,126 +363,184 @@ with tab2:
     )
 
 # =====================================
-# CHART DATA PREP
+# INDUSTRY PERFORMANCE DATA PREP (STABLE)
 # =====================================
-# Aggregate by year (important for clean lines)
-df_trend = (
-    df_filtered
-    .groupby('year', as_index=False)
-    .agg({
-        'employment': 'sum',
-        'gdp': 'sum'
-    })
-    .sort_values('year')
+
+df_growth = df_filtered.sort_values(['industry', 'year'])
+
+years_selected = df_filtered['year'].nunique()
+
+# ---- AGGREGATE BASE VALUES (ALWAYS USED) ----
+base = df_filtered.groupby('industry').agg(
+    employment=('employment', 'sum'),
+    gdp=('gdp', 'sum')
+).reset_index()
+
+# =====================================
+# MODE 1: MULTI-YEAR (TRUE GROWTH)
+# =====================================
+if years_selected > 1:
+
+    growth_summary = df_filtered.sort_values(['industry', 'year']).groupby('industry').agg(
+        start_emp=('employment', lambda x: x.iloc[0]),
+        end_emp=('employment', lambda x: x.iloc[-1]),
+        start_gdp=('gdp', lambda x: x.iloc[0]),
+        end_gdp=('gdp', lambda x: x.iloc[-1])
+    ).reset_index()
+
+    growth_summary['emp_metric'] = (
+        (growth_summary['end_emp'] - growth_summary['start_emp']) /
+        growth_summary['start_emp']
+    )
+
+    growth_summary['gdp_metric'] = (
+        (growth_summary['end_gdp'] - growth_summary['start_gdp']) /
+        growth_summary['start_gdp']
+    )
+
+    growth_summary['size_metric'] = growth_summary['end_emp']
+
+# =====================================
+# MODE 2: SINGLE YEAR OR FILTERED SNAPSHOT
+# =====================================
+else:
+
+    growth_summary = base.copy()
+
+    growth_summary['emp_metric'] = (
+        growth_summary['employment'] / growth_summary['employment'].max()
+    )
+
+    growth_summary['gdp_metric'] = (
+        growth_summary['gdp'] / growth_summary['gdp'].max()
+    )
+
+    growth_summary['size_metric'] = growth_summary['employment']
+
+# ---- FINAL NORMALIZATION (IMPORTANT) ----
+growth_summary = growth_summary.replace([float('inf'), -float('inf')], None).dropna()
+
+# =====================================
+# EMPLOYMENT GROWTH BY INDUSTRY
+# =====================================
+st.subheader(
+    '📈 Employment Growth by Industry' if not is_single_year
+    else '📊 Employment by Industry (Selected Year)'
 )
 
-df_trend['gdp_billions'] = df_trend['gdp'] / 1_000_000_000
+top_emp = growth_summary.sort_values('emp_metric', ascending=False).head(10)
 
-# =====================================
-# EMPLOYMENT TREND
-# =====================================
-st.subheader('📈 Employment Trend')
+fig_emp_growth = go.Figure()
 
-fig_emp = go.Figure()
-
-fig_emp.add_trace(go.Scatter(
-    x=df_trend['year'],
-    y=df_trend['employment']/1_000,
-    mode='lines+markers',
-    name='Employment',
-    hovertemplate='Year: %{x}<br>Employment: %{y:,.1f}K<extra></extra>'
+fig_emp_growth.add_trace(go.Bar(
+    x=top_emp['emp_metric'] * 100,
+    y=top_emp['industry'],
+    orientation='h',
+    hovertemplate='%{y}<br>Growth: %{x:.2f}%<extra></extra>'
 ))
 
-fig_emp.update_layout(
-    xaxis_title='Year',
-    yaxis_title='Employment',
-    yaxis=dict(ticksuffix='K'),
+fig_emp_growth.update_layout(
+    xaxis_title='Employment Growth (%)' if not is_single_year else 'Relative Employment',
+    yaxis_title='Industry',
     margin=dict(l=20, r=20, t=30, b=20)
 )
 
-st.plotly_chart(fig_emp, use_container_width=True)
+st.plotly_chart(fig_emp_growth, use_container_width=True)
 
 # =====================================
-# GDP TREND
+# GDP GROWTH BY INDUSTRY
 # =====================================
-st.subheader('💰 GDP Trend')
+st.subheader(
+    '💰 GDP Growth by Industry' if not is_single_year
+    else '💰 GDP by Industry (Selected Year)'
+)
 
-fig_gdp = go.Figure()
+top_gdp = growth_summary.sort_values('gdp_metric', ascending=False).head(10)
 
-fig_gdp.add_trace(go.Scatter(
-    x=df_trend['year'],
-    y=df_trend['gdp'] / 1000,
-    mode='lines+markers',
-    name='GDP',
-    hovertemplate='Year: %{x}<br>GDP: $%{y:,.2f}B<extra></extra>'
+fig_gdp_growth = go.Figure()
+
+fig_gdp_growth.add_trace(go.Bar(
+    x=top_gdp['gdp_metric'] * 100,
+    y=top_gdp['industry'],
+    orientation='h',
+    hovertemplate='%{y}<br>Growth: %{x:.2f}%<extra></extra>'
 ))
 
-fig_gdp.update_layout(
-    xaxis_title='Year',
-    yaxis_title='GDP (Billions)',
-    yaxis=dict(tickprefix='$', ticksuffix='B'),
+fig_gdp_growth.update_layout(
+    xaxis_title='GDP Growth (%)' if not is_single_year else 'Relative GDP',
+    yaxis_title='Industry',
     margin=dict(l=20, r=20, t=30, b=20)
 )
 
-st.plotly_chart(fig_gdp, use_container_width=True)
+st.plotly_chart(fig_gdp_growth, use_container_width=True)
 
 # =====================================
-# GDP vs Employment (Dual Axis)
+# INDUSTRY PERFORMANCE SCATTER
 # =====================================
-st.subheader('📊 GDP vs Employment')
-fig = go.Figure()
 
-# Employment (left axis)
-fig.add_trace(
-    go.Scatter(
-        x=df_trend['year'],
-        y=df_trend['employment']/1_000,
-        name='Employment',
-        yaxis='y1',
-        mode='lines+markers',
-        hovertemplate='Year: %{x}<br>Employment: %{y:,.1f}K<extra></extra>'
+if growth_summary is None or growth_summary.empty:
+    st.warning("Not enough data for scatter plot")
+
+else:
+    st.subheader('🎯 Industry Performance: Winners vs Losers')
+
+    fig_scatter = go.Figure()
+
+    # =====================================
+    # MULTI-YEAR MODE (TRUE GROWTH)
+    # =====================================
+    if df_filtered['year'].nunique() > 1:
+
+        x = growth_summary['emp_metric'] * 100
+        y = growth_summary['gdp_metric'] * 100
+        color = growth_summary['gdp_metric'] * 100
+
+        
+
+    # =====================================
+    # SINGLE-YEAR MODE (STRUCTURE SNAPSHOT)
+    # =====================================
+    else:
+
+        x = growth_summary['emp_metric'] * 100
+        y = growth_summary['gdp_metric'] * 100
+        color = growth_summary['gdp_metric'] * 100
+
+        
+
+    fig_scatter.add_trace(go.Scatter(
+        x=x,
+        y=y,
+        mode='markers',
+
+        marker=dict(
+            size=(
+                (growth_summary['size_metric'] /
+                 growth_summary['size_metric'].max()) * 25
+            ) + 10,
+            color=color,
+            colorscale='RdYlGn',
+            showscale=True,
+            opacity=0.75,
+            colorbar=dict(title='GDP ')
+        ),
+
+        text=growth_summary['industry'],
+
+        hovertemplate=(
+            '<b>%{text}</b><br>'
+            'Employment: %{x:.1f}<br>'
+            'GDP: %{y:.1f}<extra></extra>'
+        )
+    ))
+
+    fig_scatter.add_hline(y=0, line_dash='dash')
+    fig_scatter.add_vline(x=0, line_dash='dash')
+
+    fig_scatter.update_layout(
+        xaxis_title='Employment ',
+        yaxis_title='GDP ',
+        margin=dict(l=20, r=20, t=40, b=20)
     )
-)
 
-# GDP (right axis)
-fig.add_trace(
-    go.Scatter(
-        x=df_trend['year'],
-        y=df_trend['gdp'] / 1000,
-        name='GDP (Billions)',
-        yaxis='y2',
-        mode='lines+markers',
-        hovertemplate='Year: %{x}<br>GDP: $%{y:,.2f}B<extra></extra>'
-    )
-)
-
-# Layout
-fig.update_layout(
-    xaxis=dict(title='Year'),
-
-    yaxis=dict(
-        title='Employment (Thousands)',
-        tickformat=',',
-        ticksuffix='K'
-    ),
-
-    yaxis2=dict(
-        title='GDP (Billions)',
-        overlaying='y',
-        side='right',
-        tickprefix='$',
-        ticksuffix='B'
-    ),
-
-    legend=dict(
-        orientation='h',
-        yanchor='bottom',
-        y=1.02,
-        xanchor='right',
-        x=1
-    ),
-
-    margin=dict(l=20, r=20, t=40, b=20)
-)
-
-st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig_scatter, use_container_width=True)
