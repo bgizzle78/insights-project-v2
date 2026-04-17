@@ -11,7 +11,7 @@ sys.path.append(str(ROOT_DIR))
 # IMPORTS
 # =====================================
 import streamlit as st
-from data_loader import load_economic_data
+from utils.data_loader import load_economic_data
 import plotly.graph_objects as go
 
 # =====================================

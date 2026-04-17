@@ -12,7 +12,7 @@ sys.path.append(str(ROOT_DIR))
 # =====================================
 import pandas as pd
 import streamlit as st
-from db import run_query
+from utils.db import run_query
 
 # =====================================
 # FUNCTIONS
