@@ -15,7 +15,8 @@ from utils.data_loader import load_economic_data
 from utils.metrics import (
     add_growth_metrics,
     add_business_metrics,
-    add_share_metrics
+    add_share_metrics,
+    build_performance_summary
 )
 import plotly.graph_objects as go
 
@@ -28,9 +29,6 @@ st.title('📊 Industry Analysis')
 # LOAD DATA
 # =====================================
 df = load_economic_data()
-df = add_growth_metrics(df)
-df = add_business_metrics(df)
-df = add_share_metrics(df)
 
 # =====================================
 # FILTER BAR (IMPROVED UX)
@@ -84,6 +82,11 @@ df_filtered = df[
     (df['year'].between(selected_years[0], selected_years[1]))
 ]
 
+# ✅ APPLY METRICS HERE (AFTER FILTERING)
+df_filtered = add_growth_metrics(df_filtered)
+df_filtered = add_business_metrics(df_filtered)
+df_filtered = add_share_metrics(df_filtered)
+
 # =====================================
 # VIEW MODE DETECTION
 # =====================================
@@ -93,11 +96,22 @@ is_single_year = selected_years[0] == selected_years[1]
 # =====================================
 # KPI CARDS (GLOBAL STYLE)
 # =====================================
-
 st.subheader('📈 Key Metrics')
 
-total_employment = df_filtered['employment'].sum()
-total_gdp = df_filtered['gdp'].sum()
+years_selected = df_filtered['year'].nunique()
+
+# SINGLE YEAR → use data directly
+if years_selected == 1:
+    total_employment = df_filtered['employment'].sum()
+    total_gdp = df_filtered['gdp'].sum()
+
+# MULTI YEAR → use latest year snapshot (NOT SUM)
+else:
+    latest_year = df_filtered['year'].max()
+    df_latest = df_filtered[df_filtered['year'] == latest_year]
+
+    total_employment = df_latest['employment'].sum()
+    total_gdp = df_latest['gdp'].sum()
 
 gdp_per_worker = (total_gdp * 1_000_000) / total_employment if total_employment else 0
 
@@ -211,7 +225,19 @@ with tab1:
 with tab2:
 
     # ---- SUMMARY AGGREGATION ----
-    summary = df_filtered.groupby('industry').agg({
+    years_selected = df_filtered['year'].nunique()
+
+    # SINGLE YEAR → direct snapshot
+    if years_selected == 1:
+        summary = df_filtered.copy()
+
+    # MULTI YEAR → use latest year snapshot
+    else:
+        latest_year = df_filtered['year'].max()
+        summary = df_filtered[df_filtered['year'] == latest_year].copy()
+
+    # NOW SAFE TO AGGREGATE BUSINESS FLOW ONLY
+    summary = summary.groupby('industry').agg({
         'employment': 'sum',
         'gdp': 'sum',
         'new_filings': 'sum',
@@ -219,16 +245,17 @@ with tab2:
     }).reset_index()
 
     summary['net_business'] = summary['new_filings'] - summary['terminations']
+
     summary['employment_share'] = summary['employment'] / summary['employment'].sum()
 
     summary['gdp_per_worker'] = (
         (summary['gdp'] * 1_000_000) / summary['employment']
-    )
+)
 
     summary['importance_score'] = (
-    summary['employment_share'] * 0.5 +
-    (summary['gdp_per_worker'] / summary['gdp_per_worker'].max()) * 0.5
-)
+        summary['employment_share'] * 0.5 +
+        (summary['gdp_per_worker'] / summary['gdp_per_worker'].max()) * 0.5
+    )
     
     summary = summary[[
         'industry',
@@ -365,60 +392,7 @@ with tab2:
 # =====================================
 # INDUSTRY PERFORMANCE DATA PREP (STABLE)
 # =====================================
-
-df_growth = df_filtered.sort_values(['industry', 'year'])
-
-years_selected = df_filtered['year'].nunique()
-
-# ---- AGGREGATE BASE VALUES (ALWAYS USED) ----
-base = df_filtered.groupby('industry').agg(
-    employment=('employment', 'sum'),
-    gdp=('gdp', 'sum')
-).reset_index()
-
-# =====================================
-# MODE 1: MULTI-YEAR (TRUE GROWTH)
-# =====================================
-if years_selected > 1:
-
-    growth_summary = df_filtered.sort_values(['industry', 'year']).groupby('industry').agg(
-        start_emp=('employment', lambda x: x.iloc[0]),
-        end_emp=('employment', lambda x: x.iloc[-1]),
-        start_gdp=('gdp', lambda x: x.iloc[0]),
-        end_gdp=('gdp', lambda x: x.iloc[-1])
-    ).reset_index()
-
-    growth_summary['emp_metric'] = (
-        (growth_summary['end_emp'] - growth_summary['start_emp']) /
-        growth_summary['start_emp']
-    )
-
-    growth_summary['gdp_metric'] = (
-        (growth_summary['end_gdp'] - growth_summary['start_gdp']) /
-        growth_summary['start_gdp']
-    )
-
-    growth_summary['size_metric'] = growth_summary['end_emp']
-
-# =====================================
-# MODE 2: SINGLE YEAR OR FILTERED SNAPSHOT
-# =====================================
-else:
-
-    growth_summary = base.copy()
-
-    growth_summary['emp_metric'] = (
-        growth_summary['employment'] / growth_summary['employment'].max()
-    )
-
-    growth_summary['gdp_metric'] = (
-        growth_summary['gdp'] / growth_summary['gdp'].max()
-    )
-
-    growth_summary['size_metric'] = growth_summary['employment']
-
-# ---- FINAL NORMALIZATION (IMPORTANT) ----
-growth_summary = growth_summary.replace([float('inf'), -float('inf')], None).dropna()
+growth_summary = build_performance_summary(df_filtered)
 
 # =====================================
 # EMPLOYMENT GROWTH BY INDUSTRY
