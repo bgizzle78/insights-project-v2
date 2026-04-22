@@ -11,14 +11,16 @@ sys.path.append(str(ROOT_DIR))
 # IMPORTS
 # =====================================
 import streamlit as st
+import plotly.graph_objects as go
 from utils.data_loader import load_economic_data
 from utils.metrics import (
     add_growth_metrics,
     add_business_metrics,
     add_share_metrics,
-    build_performance_summary
+    build_performance_summary,
+    get_analysis_snapshot,
+    build_ranked_bar_chart
 )
-import plotly.graph_objects as go
 
 # =====================================
 # PAGE TITLE
@@ -31,9 +33,15 @@ st.title('📊 Industry Analysis')
 df = load_economic_data()
 
 # =====================================
-# FILTER BAR (IMPROVED UX)
+# FILTER BAR
 # =====================================
 st.subheader('🔎 Filters')
+
+view_mode = st.radio(
+    'View Mode',
+    ['Growth (Multi-Year)', 'Snapshot (Single Year)'],
+    horizontal=True
+)
 
 industries = sorted(df['industry'].dropna().unique())
 
@@ -43,29 +51,34 @@ with col1:
     select_all = st.checkbox('Select All Industries', value=True)
 
     if select_all:
-        selected_industries = st.multiselect(
-            'Industries',
-            options=industries,
-            default=industries,
-            placeholder='Select industries...'
-        )
+        selected_industries = industries
     else:
-        selected_industries = st.multiselect(
-            'Industries',
-            options=industries,
-            default=[]
+        selected_industries = st.selectbox(
+            'Select Industry',
+            options=industries
         )
+        selected_industries = [selected_industries]
 
 with col2:
     min_year = int(df['year'].min())
     max_year = int(df['year'].max())
-
     selected_years = st.slider(
         'Year Range',
         min_value=min_year,
         max_value=max_year,
         value=(min_year, max_year)
     )
+
+# =====================================
+# ENFORCE VIEW MODE RULES
+# =====================================
+if view_mode == 'Snapshot (Single Year)':
+    # force single year
+    selected_years = (selected_years[1], selected_years[1])
+
+if view_mode == 'Growth (Multi-Year)' and selected_years[0] == selected_years[1]:
+    st.warning('Select a range of at least 2 years for Growth mode')
+    st.stop()
 
 with col3:
     if st.button('Reset Filters'):
@@ -88,88 +101,42 @@ df_filtered = add_business_metrics(df_filtered)
 df_filtered = add_share_metrics(df_filtered)
 
 # =====================================
-# VIEW MODE DETECTION
-# =====================================
-
-is_single_year = selected_years[0] == selected_years[1]
-
-# =====================================
-# KPI CARDS (GLOBAL STYLE)
+# KPI CARDS
 # =====================================
 st.subheader('📈 Key Metrics')
 
-years_selected = df_filtered['year'].nunique()
+df_kpi = get_analysis_snapshot(df_filtered)
 
-# SINGLE YEAR → use data directly
-if years_selected == 1:
-    total_employment = df_filtered['employment'].sum()
-    total_gdp = df_filtered['gdp'].sum()
-
-# MULTI YEAR → use latest year snapshot (NOT SUM)
-else:
-    latest_year = df_filtered['year'].max()
-    df_latest = df_filtered[df_filtered['year'] == latest_year]
-
-    total_employment = df_latest['employment'].sum()
-    total_gdp = df_latest['gdp'].sum()
+total_employment = df_kpi['employment'].sum()
+total_gdp = df_kpi['gdp'].sum()
 
 gdp_per_worker = (total_gdp * 1_000_000) / total_employment if total_employment else 0
 
-card1, card2, card3 = st.columns(3)
+col1, col2, col3 = st.columns(3)
 
-# ---- Employment Card ----
-with card1:
-    st.markdown(f'''
-    <div style="
-        background-color: #1f1f1f;
-        padding: 18px;
-        border-radius: 14px;
-        height: 130px;
-        line-height: 1.1;
-    ">
-        <div style="font-size: 24px; opacity: 0.7;">Total Employment</div>
-        <div style="font-size: 30px; font-weight: 700; margin-top: 10px;">
-            {int(total_employment):,}
-        </div>
-    </div>
-    ''', unsafe_allow_html=True)
+# ----- EMPLOYMENT CARD -----
+col1.metric(
+    'Total Employment',
+    f'{int(total_employment):,}'
+)
 
-# ---- GDP Card ----
-with card2:
-    gdp_display = f'${total_gdp/1_000:,.2f}B' if total_gdp < 1_000_000 else f'${total_gdp/1_000_000:,.2f}T'
+# ----- GDP CARD -----
+gdp_display = (
+    f'${total_gdp/1_000:,.2f}B'
+    if total_gdp < 1_000_000
+    else f'${total_gdp/1_000_000:,.2f}T'
+)
 
-    st.markdown(f'''
-    <div style="
-        background-color: #1f1f1f;
-        padding: 18px;
-        border-radius: 14px;
-        height: 130px;
-        line-height: 1.1;
-    ">
-        <div style="font-size: 24px; opacity: 0.7;">Total GDP</div>
-        <div style="font-size: 30px; font-weight: 700; margin-top: 10px; color: #2ecc71;">
-            {gdp_display}
-        </div>
-    </div>
-    ''', unsafe_allow_html=True)
+col2.metric(
+    'Total GDP',
+    gdp_display
+)
 
-# ---- GDP per Worker Card ----
-with card3:
-
-    st.markdown(f'''
-    <div style="
-        background-color: #1f1f1f;
-        padding: 18px;
-        border-radius: 14px;
-        height: 130px;
-        line-height: 1.1;
-    ">
-        <div style="font-size: 24px; opacity: 0.7;">GDP per Worker</div>
-        <div style="font-size: 30px; font-weight: 700; margin-top: 10px;">
-            ${gdp_per_worker:,.0f}
-        </div>
-    </div>
-    ''', unsafe_allow_html=True)
+# ----- GDP PER WORKER CARD -----
+col3.metric(
+    'GDP per Worker',
+    f'${gdp_per_worker:,.0f}'
+)
 
 st.divider()
 
@@ -224,19 +191,9 @@ with tab1:
 # ---------- TAB 2 — SUMMARY INSIGHTS ----------
 with tab2:
 
-    # ---- SUMMARY AGGREGATION ----
-    years_selected = df_filtered['year'].nunique()
+    summary = get_analysis_snapshot(df_filtered)
 
-    # SINGLE YEAR → direct snapshot
-    if years_selected == 1:
-        summary = df_filtered.copy()
-
-    # MULTI YEAR → use latest year snapshot
-    else:
-        latest_year = df_filtered['year'].max()
-        summary = df_filtered[df_filtered['year'] == latest_year].copy()
-
-    # NOW SAFE TO AGGREGATE BUSINESS FLOW ONLY
+    # AGGREGATE BUSINESS FLOW ONLY
     summary = summary.groupby('industry').agg({
         'employment': 'sum',
         'gdp': 'sum',
@@ -255,7 +212,7 @@ with tab2:
     summary['importance_score'] = (
         summary['employment_share'] * 0.5 +
         (summary['gdp_per_worker'] / summary['gdp_per_worker'].max()) * 0.5
-    )
+     )
     
     summary = summary[[
         'industry',
@@ -280,79 +237,36 @@ with tab2:
         .str.title()
     )
 
-    # ---- KPI CARDS ----
+    # ---- KPI SUMMARY ----
     top = summary.sort_values('importance_score', ascending=False).iloc[0]
 
     st.markdown('### 🏆 Top Performing Industry')
 
-    card_col1, card_col2, card_col3, card_col4 = st.columns(4)
+    col1, col2, col3, col4 = st.columns(4)
 
-    with card_col1:
-        st.markdown(f'''
-        <div style="
-            background-color: #1f1f1f;
-            padding: 12px;
-            border-radius: 12px;
-            height: 140px;
-            line-height: 1.1;
-        ">
-            <div style="font-size: 20px; opacity: 0.7;">Industry</div>
-            <div style="font-size: 18px; font-weight: 600; line-height: 1.3; white-space: normal; overflow-wrap: break-word;">
-                {top['industry']}
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
+    col1.metric(
+    'Industry',
+    top['industry'],
+    help=top['industry']
+    )
 
-    with card_col2:
-        st.markdown(f'''
-        <div style="
-            background-color: #1f1f1f;
-            padding: 12px;
-            border-radius: 12px;
-            height: 140px;
-            line-height: 1.1;
-        ">
-            <div style="font-size: 20px; opacity: 0.7;">GDP</div>
-            <div style="font-size: 26px; font-weight: 700; color: #2ecc71;">
-                ${top['gdp']/1_000:,.2f}B
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
+    col2.metric(
+        'GDP',
+        f'${top['gdp']/1_000:,.2f}B'
+    )
 
-    with card_col3:
-        st.markdown(f'''
-        <div style="
-            background-color: #1f1f1f;
-            padding: 12px;
-            border-radius: 12px;
-            height: 140px;
-            line-height: 1.1;
-        ">
-            <div style="font-size: 20px; opacity: 0.7;">Employment</div>
-            <div style="font-size: 26px; font-weight: 700;">
-                {top['employment']:,.0f}
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
+    col3.metric(
+        'Employment',
+        f'{top['employment']:,.0f}'
+    )
 
-    net = top['net_business']
-    color = '#2ecc71' if net >= 0 else '#e74c3c'
+    net = int(top['net_business'])
 
-    with card_col4:
-        st.markdown(f'''
-        <div style="
-            background-color: #1f1f1f;
-            padding: 12px;
-            border-radius: 12px;
-            height: 140px;
-            line-height: 1.1;
-        ">
-            <div style="font-size: 20px; opacity: 0.7;">Net Growth</div>
-            <div style="font-size: 26px; font-weight: 700; color: {color};">
-                {net:,.0f}
-            </div>
-        </div>
-        ''', unsafe_allow_html=True)
+    col4.metric(
+        'Net Growth',
+        f'{net:,.0f}',
+        delta=net
+    )
 
     st.divider()
 
@@ -367,7 +281,15 @@ with tab2:
     'Employment Share': '{:,.1%}',
     'Importance Score': '{:,.2f}'
 }
-    styled_summary = summary_display.style.format(format_dict)
+    # ---- TABLE DISPLAY ----
+    styled_summary = summary_display.copy()
+
+    styled_summary = styled_summary.style.format(format_dict)
+
+    styled_summary = styled_summary.background_gradient(
+        subset=['Gdp', 'Net Business'],
+        cmap='RdYlGn'
+    )
 
     # ---- APPLY COLOR GRADIENTS ----
     if 'Gdp' in summary_display.columns:
@@ -398,25 +320,25 @@ growth_summary = build_performance_summary(df_filtered)
 # EMPLOYMENT GROWTH BY INDUSTRY
 # =====================================
 st.subheader(
-    '📈 Employment Growth by Industry' if not is_single_year
+    '📈 Employment Growth by Industry'
+    if view_mode == 'Growth (Multi-Year)'
     else '📊 Employment by Industry (Selected Year)'
 )
 
-top_emp = growth_summary.sort_values('emp_metric', ascending=False).head(10)
+if view_mode == 'Growth (Multi-Year)':
+    top_emp = growth_summary.sort_values('emp_metric', ascending=False).head(10)
+    top_emp['value'] = top_emp['emp_metric'] * 100
+    x_label_emp = 'Employment Growth (%)'
+else:
+    snapshot_df = df_filtered.groupby('industry')['employment'].sum().reset_index()
+    snapshot_df['value'] = snapshot_df['employment'] / snapshot_df['employment'].sum() * 100
+    x_label_emp = 'Employment Share (%)'
 
-fig_emp_growth = go.Figure()
-
-fig_emp_growth.add_trace(go.Bar(
-    x=top_emp['emp_metric'] * 100,
-    y=top_emp['industry'],
-    orientation='h',
-    hovertemplate='%{y}<br>Growth: %{x:.2f}%<extra></extra>'
-))
-
-fig_emp_growth.update_layout(
-    xaxis_title='Employment Growth (%)' if not is_single_year else 'Relative Employment',
-    yaxis_title='Industry',
-    margin=dict(l=20, r=20, t=30, b=20)
+fig_emp_growth = build_ranked_bar_chart(
+    df=top_emp if view_mode == 'Growth (Multi-Year)' else snapshot_df,
+    value_col='value',
+    label_col='industry',
+    title=x_label_emp
 )
 
 st.plotly_chart(fig_emp_growth, use_container_width=True)
@@ -425,25 +347,22 @@ st.plotly_chart(fig_emp_growth, use_container_width=True)
 # GDP GROWTH BY INDUSTRY
 # =====================================
 st.subheader(
-    '💰 GDP Growth by Industry' if not is_single_year
+    '💰 GDP Growth by Industry' if view_mode == 'Growth (Multi-Year)'
     else '💰 GDP by Industry (Selected Year)'
 )
 
-top_gdp = growth_summary.sort_values('gdp_metric', ascending=False).head(10)
+if view_mode == 'Growth (Multi-Year)':
+    top_gdp = growth_summary.sort_values('gdp_metric', ascending=False).head(10)
+    top_gdp['value'] = top_gdp['gdp_metric'] * 100
+else:
+    snapshot_df = df_filtered.groupby('industry')['gdp'].sum().reset_index()
+    snapshot_df['value'] = snapshot_df['gdp'] / snapshot_df['gdp'].sum() * 100
 
-fig_gdp_growth = go.Figure()
-
-fig_gdp_growth.add_trace(go.Bar(
-    x=top_gdp['gdp_metric'] * 100,
-    y=top_gdp['industry'],
-    orientation='h',
-    hovertemplate='%{y}<br>Growth: %{x:.2f}%<extra></extra>'
-))
-
-fig_gdp_growth.update_layout(
-    xaxis_title='GDP Growth (%)' if not is_single_year else 'Relative GDP',
-    yaxis_title='Industry',
-    margin=dict(l=20, r=20, t=30, b=20)
+fig_gdp_growth = build_ranked_bar_chart(
+    df=top_gdp if view_mode == 'Growth (Multi-Year)' else snapshot_df,
+    value_col='value',
+    label_col='industry',
+    title='GDP Comparison'
 )
 
 st.plotly_chart(fig_gdp_growth, use_container_width=True)
@@ -451,70 +370,68 @@ st.plotly_chart(fig_gdp_growth, use_container_width=True)
 # =====================================
 # INDUSTRY PERFORMANCE SCATTER
 # =====================================
+st.subheader('🎯 Industry Performance: Winners vs Losers')
 
-if growth_summary is None or growth_summary.empty:
-    st.warning("Not enough data for scatter plot")
+fig_scatter = go.Figure()
 
+# =====================================
+# GROWTH MODE
+# =====================================
+if view_mode == 'Growth (Multi-Year)':
+
+    x = growth_summary['emp_metric'] * 100
+    y = growth_summary['gdp_metric'] * 100
+    color = growth_summary['gdp_metric'] * 100
+    size = growth_summary['size_metric']
+
+    hover_df = growth_summary
+
+# =====================================
+# SNAPSHOT MODE
+# =====================================
 else:
-    st.subheader('🎯 Industry Performance: Winners vs Losers')
 
-    fig_scatter = go.Figure()
+    snapshot_df = get_analysis_snapshot(df_filtered).groupby('industry').agg({
+        'employment': 'sum',
+        'gdp': 'sum'
+    }).reset_index()
 
-    # =====================================
-    # MULTI-YEAR MODE (TRUE GROWTH)
-    # =====================================
-    if df_filtered['year'].nunique() > 1:
+    snapshot_df['emp_share'] = snapshot_df['employment'] / snapshot_df['employment'].sum()
+    snapshot_df['gdp_share'] = snapshot_df['gdp'] / snapshot_df['gdp'].sum()
 
-        x = growth_summary['emp_metric'] * 100
-        y = growth_summary['gdp_metric'] * 100
-        color = growth_summary['gdp_metric'] * 100
+    x = snapshot_df['emp_share'] * 100
+    y = snapshot_df['gdp_share'] * 100
+    color = snapshot_df['gdp_share'] * 100
+    size = snapshot_df['employment']
 
-        
+    hover_df = snapshot_df
 
-    # =====================================
-    # SINGLE-YEAR MODE (STRUCTURE SNAPSHOT)
-    # =====================================
-    else:
+# =====================================
+# SCATTER PLOT (COMMON)
+# =====================================
+fig_scatter.add_trace(go.Scatter(
+    x=x,
+    y=y,
+    mode='markers',
+    marker=dict(
+        size=(size / size.max()) * 25 + 10,
+        color=color,
+        colorscale='RdYlGn',
+        showscale=True,
+        opacity=0.75,
+        colorbar=dict(title='GDP')
+    ),
+    text=hover_df['industry'],
+    hovertemplate='<b>%{text}</b><br>GDP: %{x:.1f}%<br>Employment: %{y:.1f}%<extra></extra>'
+))
 
-        x = growth_summary['emp_metric'] * 100
-        y = growth_summary['gdp_metric'] * 100
-        color = growth_summary['gdp_metric'] * 100
+fig_scatter.add_hline(y=0, line_dash='dash')
+fig_scatter.add_vline(x=0, line_dash='dash')
 
-        
+fig_scatter.update_layout(
+    xaxis_title='Employment Metric',
+    yaxis_title='GDP Metric',
+    margin=dict(l=20, r=20, t=40, b=20)
+)
 
-    fig_scatter.add_trace(go.Scatter(
-        x=x,
-        y=y,
-        mode='markers',
-
-        marker=dict(
-            size=(
-                (growth_summary['size_metric'] /
-                 growth_summary['size_metric'].max()) * 25
-            ) + 10,
-            color=color,
-            colorscale='RdYlGn',
-            showscale=True,
-            opacity=0.75,
-            colorbar=dict(title='GDP ')
-        ),
-
-        text=growth_summary['industry'],
-
-        hovertemplate=(
-            '<b>%{text}</b><br>'
-            'Employment: %{x:.1f}<br>'
-            'GDP: %{y:.1f}<extra></extra>'
-        )
-    ))
-
-    fig_scatter.add_hline(y=0, line_dash='dash')
-    fig_scatter.add_vline(x=0, line_dash='dash')
-
-    fig_scatter.update_layout(
-        xaxis_title='Employment ',
-        yaxis_title='GDP ',
-        margin=dict(l=20, r=20, t=40, b=20)
-    )
-
-    st.plotly_chart(fig_scatter, use_container_width=True)
+st.plotly_chart(fig_scatter, use_container_width=True)
