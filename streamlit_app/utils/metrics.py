@@ -145,14 +145,30 @@ def get_analysis_snapshot(df, year_col='year'):
     return df[df[year_col] == latest_year].copy()
 
 
-def build_ranked_bar_chart(df, value_col, label_col='industry', top_n=10, title=''):
-    """Builds a standardized ranked horizontal bar chart.
-    Used for:
-    - Employment ranking
-    - GDP ranking
-    - Any grouped performance comparison"""
+def build_ranked_bar_chart(
+    df,
+    value_col,
+    label_col='industry',
+    top_n=10,
+    title='',
+    x_label='',
+    value_format='number'  # 'percent' or 'number'
+):
+    """Builds a clean, self-explanatory horizontal bar chart.
+    Parameters:
+    - value_format:
+        'percent' → formats values as %
+        'number' → formats as raw numeric values"""
 
     df_ranked = df.sort_values(value_col, ascending=False).head(top_n)
+
+    # =====================================
+    # FORMAT CONTROL
+    # =====================================
+    if value_format == 'percent':
+        hover_template = '%{y}<br>Value: %{x:.2f}%<extra></extra>'
+    else:
+        hover_template = '%{y}<br>Value: %{x:,.0f}<extra></extra>'
 
     fig = go.Figure()
 
@@ -160,12 +176,12 @@ def build_ranked_bar_chart(df, value_col, label_col='industry', top_n=10, title=
         x=df_ranked[value_col],
         y=df_ranked[label_col],
         orientation='h',
-        hovertemplate='%{y}<br>Value: %{x:.1f}<extra></extra>'
+        hovertemplate=hover_template
     ))
 
     fig.update_layout(
         title=title,
-        xaxis_title=value_col.replace('_', ' ').title(),
+        xaxis_title=x_label if x_label else value_col.replace('_', ' ').title(),
         yaxis_title=label_col.title(),
         margin=dict(l=20, r=20, t=40, b=20)
     )

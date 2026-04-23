@@ -1,24 +1,32 @@
 # 🌄 West Virginia Economic Analysis  
-### Data Pipeline • Database • Dashboard
+### Data Pipeline • Database • Interactive Dashboard
 
 ---
 
 ## 📌 Project Overview
 
-This project is a production-style rebuild of a previously completed economic analysis of West Virginia.
+This project is a **production-style rebuild** of a previously completed team-based economic analysis of West Virginia’s economy.
 
-The original analysis explored workforce dynamics, industry structure, economic growth, and business activity across the state.  
-This version transforms that work into a structured, end-to-end data project focused on **data engineering, scalability, and reproducibility**.
+The original team project developed an initial analytical framework exploring workforce trends, industry structure, and business activity using multiple public datasets.
+
+This version re-engineers and extends that work into a structured, production-style system with:
+
+- Modular Python data pipeline  
+- PostgreSQL database layer  
+- Reusable analytical functions  
+- Interactive Streamlit dashboard  
+
+The goal is to demonstrate how an existing analytical project can be transformed into a scalable, production-ready data application.
 
 ---
 
 ## 🎯 Objectives
 
-- Rebuild the analysis using a modular data pipeline  
-- Store and manage datasets in a PostgreSQL database  
-- Perform analysis using SQL and Python  
-- Develop an interactive dashboard for exploration  
-- Demonstrate real-world data engineering workflows  
+- Build a modular data pipeline using Python  
+- Store and manage datasets in PostgreSQL  
+- Standardize analytical logic across datasets  
+- Develop an interactive Streamlit dashboard  
+- Translate raw data into clear, explainable insights  
 
 ---
 
@@ -34,13 +42,13 @@ This version transforms that work into a structured, end-to-end data project foc
 ![SQL](https://img.shields.io/badge/SQL-Data_Querying-4169E1?style=flat&logo=microsoftsqlserver&logoColor=white)
 
 ### 📊 Visualization & Analytics
-![Streamlit](https://img.shields.io/badge/Streamlit-Data_App-red?style=flate&logo=streamlit&logoColor=)
-![Data Visualization](https://img.shields.io/badge/Data_Visualization-Analytics-red?style=flat)
+![Streamlit](https://img.shields.io/badge/Streamlit-Data_App-red?style=flat&logo=streamlit&logoColor=white)
+![Plotly](https://img.shields.io/badge/Plotly-Visualization-red?style=flat)
 ![Time Series](https://img.shields.io/badge/Time_Series-Analysis-red?style=flat)
 
 ### 🛠️ Tools & Environment
 ![VS Code](https://img.shields.io/badge/VS_Code-Development_Environment-orange?style=flat&logo=visual-studio-code&logoColor=white)
-![Jupyter](https://img.shields.io/badge/Jupyter-Data_Exploration-orange?style=flat&logo=jupyter&logoColor=)
+![Jupyter](https://img.shields.io/badge/Jupyter-Data_Exploration-orange?style=flat&logo=jupyter&logoColor=orange)
 ![Git](https://img.shields.io/badge/Git-Version_Control-orange?style=flat&logo=git&logoColor=orange)
 ![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat&logo=github&logoColor=white)
 
@@ -48,38 +56,83 @@ This version transforms that work into a structured, end-to-end data project foc
 
 ## 🏗️ Project Architecture
 
-This project follows a structured data workflow:
+This project follows a structured ETL data workflow:
 
-1. **Extract** – Collect raw data from multiple sources (BLS, BEA, WVSOS)  
-2. **Transform** – Clean, standardize, and prepare datasets using Python  
-3. **Load** – Store processed data in PostgreSQL  
-4. **Analyze** – Query data using SQL for insights  
-5. **Visualize** – Build dashboards for interactive exploration  
+1. **Extract** – Collect raw data from:
+   - Bureau of Labor Statistics (BLS)  
+   - Bureau of Economic Analysis (BEA)  
+   - West Virginia Secretary of State (WVSOS)  
+
+2. **Transform** – Clean and standardize datasets using Python (Pandas)
+
+3. **Load** – Store processed data in PostgreSQL
+
+4. **Analyze** – Apply reusable analytical logic (growth, share, trends)
+
+5. **Visualize** – Deliver insights through a Streamlit dashboard
+
+---
+
+## 📊 Dashboard Features
+
+### 🔍 Industry Analysis
+- Compare industries by employment and GDP
+- Identify growth vs decline using multi-year analysis
+- Visualize performance using scatter plots with quadrant analysis
+
+### 📈 Economic Trends
+- Track statewide trends in:
+  - Employment  
+  - Labor Force  
+  - Labor Force Participation Rate (LFPR)  
+  - Unemployment Rate  
+- Analyze long-term labor market dynamics
+
+### 🏢 Business Dynamics
+- Explore business formation and termination trends  
+- Measure net business growth across industries  
+- Identify sectors with expanding or contracting activity  
+
+---
+
+## 🧠 Key Insights (Example)
+
+- Employment is concentrated in a small number of dominant industries  
+- Labor force participation shows long-term structural trends  
+- Some industries exhibit strong employment growth but weaker GDP performance  
+- Business formation varies significantly across sectors  
 
 ---
 
 ## 📈 Project Evolution
 
-This project builds on the original *West Virginia Economic Trends* analysis and enhances it with:
+This project builds directly on a previously completed team-based economic analysis of West Virginia’s economy.
 
-- Modular, production-style code structure  
-- Automated data processing pipelines  
-- Scalable database storage  
-- Improved accessibility through interactive dashboards  
+Original project:  
+[West Virginia Economic Trends – Generation WV NewForce Insights Team Project](https://wvinsights.info/)
+
+It evolved from a notebook-based analysis into a structured, production-style application with:
+
+- Modular code organization (`utils`, `sql`, `pages`)  
+- Reusable analytical logic (growth, share, performance metrics)  
+- Centralized data transformations  
+- Interactive Streamlit dashboard  
+
+This transition reflects a shift from exploratory analysis → production-ready analytics system.  
 
 ---
 
 ## 🚀 Status
 
-🟡 In Progress — actively building data pipelines and integrating datasets
+🟢 Complete — core pipeline, database, and dashboard are fully functional  
 
 ---
 
-## 📌 Next Steps
+## 📌 Future Improvements
 
-- [ ] Complete ingestion of all datasets (BLS, BEA, WVSOS)  
-- [ ] Finalize PostgreSQL schema and loading scripts  
-- [ ] Develop core SQL analysis queries  
-- [ ] Build and deploy dashboard application  
+- [ ] Deploy Streamlit app for public access  
+- [ ] Add geographic (county-level) analysis  
+- [ ] Expand industry-level forecasting  
+- [ ] Integrate additional economic indicators  
 
 ---

@@ -73,17 +73,18 @@ with col2:
 # ENFORCE VIEW MODE RULES
 # =====================================
 if view_mode == 'Snapshot (Single Year)':
-    # force single year
+    # ---- Force single year ----
     selected_years = (selected_years[1], selected_years[1])
 
 if view_mode == 'Growth (Multi-Year)' and selected_years[0] == selected_years[1]:
     st.warning('Select a range of at least 2 years for Growth mode')
     st.stop()
 
-with col3:
-    if st.button('Reset Filters'):
-        selected_industries = industries
-        selected_years = (min_year, max_year)
+# # ---- Reset filter button ----
+# with col3:
+#     if st.button('Reset Filters'):
+#         selected_industries = industries
+#         selected_years = (min_year, max_year)
 
 st.divider()
 
@@ -338,7 +339,8 @@ fig_emp_growth = build_ranked_bar_chart(
     df=top_emp if view_mode == 'Growth (Multi-Year)' else snapshot_df,
     value_col='value',
     label_col='industry',
-    title=x_label_emp
+    x_label=x_label_emp,
+    value_format='percent'
 )
 
 st.plotly_chart(fig_emp_growth, use_container_width=True)
@@ -362,7 +364,8 @@ fig_gdp_growth = build_ranked_bar_chart(
     df=top_gdp if view_mode == 'Growth (Multi-Year)' else snapshot_df,
     value_col='value',
     label_col='industry',
-    title='GDP Comparison'
+    x_label='GDP (%)',
+    value_format='percent'
 )
 
 st.plotly_chart(fig_gdp_growth, use_container_width=True)
@@ -375,62 +378,86 @@ st.subheader('🎯 Industry Performance: Winners vs Losers')
 fig_scatter = go.Figure()
 
 # =====================================
-# GROWTH MODE
+# PREP DATA BASED ON MODE
 # =====================================
 if view_mode == 'Growth (Multi-Year)':
 
-    x = growth_summary['emp_metric'] * 100
-    y = growth_summary['gdp_metric'] * 100
-    color = growth_summary['gdp_metric'] * 100
-    size = growth_summary['size_metric']
+    scatter_df = growth_summary.copy()
 
-    hover_df = growth_summary
+    scatter_df['x'] = scatter_df['emp_metric'] * 100
+    scatter_df['y'] = scatter_df['gdp_metric'] * 100
+    scatter_df['size'] = scatter_df['size_metric']
 
-# =====================================
-# SNAPSHOT MODE
-# =====================================
+    x_label = 'Employment Growth (%)'
+    y_label = 'GDP Growth (%)'
+
 else:
-
-    snapshot_df = get_analysis_snapshot(df_filtered).groupby('industry').agg({
+    scatter_df = get_analysis_snapshot(df_filtered).groupby('industry').agg({
         'employment': 'sum',
         'gdp': 'sum'
     }).reset_index()
 
-    snapshot_df['emp_share'] = snapshot_df['employment'] / snapshot_df['employment'].sum()
-    snapshot_df['gdp_share'] = snapshot_df['gdp'] / snapshot_df['gdp'].sum()
+    scatter_df['x'] = scatter_df['employment'] / scatter_df['employment'].sum() * 100
+    scatter_df['y'] = scatter_df['gdp'] / scatter_df['gdp'].sum() * 100
+    scatter_df['size'] = scatter_df['employment']
 
-    x = snapshot_df['emp_share'] * 100
-    y = snapshot_df['gdp_share'] * 100
-    color = snapshot_df['gdp_share'] * 100
-    size = snapshot_df['employment']
+    x_label = 'Employment Share (%)'
+    y_label = 'GDP Share (%)'
 
-    hover_df = snapshot_df
 
 # =====================================
-# SCATTER PLOT (COMMON)
+# BUILD SCATTER
 # =====================================
 fig_scatter.add_trace(go.Scatter(
-    x=x,
-    y=y,
+    x=scatter_df['x'],
+    y=scatter_df['y'],
     mode='markers',
+
     marker=dict(
-        size=(size / size.max()) * 25 + 10,
-        color=color,
+        size=(scatter_df['size'] / scatter_df['size'].max()) * 25 + 10,
+        color=scatter_df['y'],
         colorscale='RdYlGn',
         showscale=True,
-        opacity=0.75,
-        colorbar=dict(title='GDP')
+        opacity=0.75
     ),
-    text=hover_df['industry'],
-    hovertemplate='<b>%{text}</b><br>GDP: %{x:.1f}%<br>Employment: %{y:.1f}%<extra></extra>'
+
+    text=scatter_df['industry'],
+
+    hovertemplate=(
+        '<b>%{text}</b><br>' +
+        'Employment Share: %{x:.2f}%<br>' +
+        'GDP Share: %{y:.2f}%<extra></extra>'
+    )
 ))
 
-fig_scatter.add_hline(y=0, line_dash='dash')
-fig_scatter.add_vline(x=0, line_dash='dash')
+# =====================================
+# ADD QUADRANT LINES
+# =====================================
+if view_mode == 'Growth (Multi-Year)':
+    x_mid = 0
+    y_mid = 0
+else:
+    x_mid = scatter_df['x'].mean()
+    y_mid = scatter_df['y'].mean()
 
+fig_scatter.add_vline(
+    x=x_mid,
+    line_dash='dash',
+    line_color='rgba(100,100,100,0.5)'
+)
+
+fig_scatter.add_hline(
+    y=y_mid,
+    line_dash='dash',
+    line_color='rgba(100,100,100,0.5)'
+)
+
+# =====================================
+# AXIS + LAYOUT
+# =====================================
 fig_scatter.update_layout(
-    xaxis_title='Employment Metric',
-    yaxis_title='GDP Metric',
+    xaxis_title=x_label,
+    yaxis_title=y_label,
     margin=dict(l=20, r=20, t=40, b=20)
 )
 
