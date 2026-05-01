@@ -12,6 +12,7 @@ sys.path.append(str(ROOT_DIR))
 # =====================================
 import streamlit as st
 import plotly.graph_objects as go
+from utils.ui import render_kpi_card
 from utils.data_loader import load_economic_data
 from utils.metrics import (
     add_growth_metrics,
@@ -50,14 +51,16 @@ col1, col2, col3 = st.columns([2, 1, 1])
 with col1:
     select_all = st.checkbox('Select All Industries', value=True)
 
+    selected_industry = st.selectbox(
+        'Select Industry',
+        options=industries,
+        disabled=select_all
+    )
+
     if select_all:
         selected_industries = industries
     else:
-        selected_industries = st.selectbox(
-            'Select Industry',
-            options=industries
-        )
-        selected_industries = [selected_industries]
+        selected_industries = [selected_industry]
 
 with col2:
     min_year = int(df['year'].min())
@@ -102,7 +105,7 @@ df_filtered = add_business_metrics(df_filtered)
 df_filtered = add_share_metrics(df_filtered)
 
 # =====================================
-# KPI CARDS
+# KPI CARDS (GLOBAL STYLE)
 # =====================================
 st.subheader('📈 Key Metrics')
 
@@ -113,31 +116,36 @@ total_gdp = df_kpi['gdp'].sum()
 
 gdp_per_worker = (total_gdp * 1_000_000) / total_employment if total_employment else 0
 
-col1, col2, col3 = st.columns(3)
-
-# ----- EMPLOYMENT CARD -----
-col1.metric(
-    'Total Employment',
-    f'{int(total_employment):,}'
-)
-
-# ----- GDP CARD -----
+# ---- FORMAT GDP DISPLAY ----
 gdp_display = (
     f'${total_gdp/1_000:,.2f}B'
     if total_gdp < 1_000_000
     else f'${total_gdp/1_000_000:,.2f}T'
 )
 
-col2.metric(
-    'Total GDP',
-    gdp_display
-)
+cols = st.columns(3)
 
-# ----- GDP PER WORKER CARD -----
-col3.metric(
-    'GDP per Worker',
-    f'${gdp_per_worker:,.0f}'
-)
+# ---- Employment ----
+with cols[0]:
+    render_kpi_card(
+        'Total Employment',
+        f'{int(total_employment):,}'
+    )
+
+# ---- GDP ----
+with cols[1]:
+    render_kpi_card(
+        'Total GDP',
+        gdp_display,
+        '#4CAF50'
+    )
+
+# ---- GDP per Worker ----
+with cols[2]:
+    render_kpi_card(
+        'GDP per Worker',
+        f'${gdp_per_worker:,.0f}'
+    )
 
 st.divider()
 
@@ -245,29 +253,33 @@ with tab2:
 
     col1, col2, col3, col4 = st.columns(4)
 
-    col1.metric(
-    'Industry',
-    top['industry'],
-    help=top['industry']
-    )
+    with col1:
+        render_kpi_card(
+            'Top Industry',
+            f'{top['industry']}'
+        )
 
-    col2.metric(
-        'GDP',
-        f'${top['gdp']/1_000:,.2f}B'
-    )
+    with col2:
+        render_kpi_card(
+            'GDP',
+            f'${top['gdp']/1_000:,.2f}B',
+         '#4CAF50'
+        )
 
-    col3.metric(
-        'Employment',
-        f'{top['employment']:,.0f}'
-    )
+    with col3:
+        render_kpi_card(
+            'Employment',
+            f'{top['employment']:,.0f}'
+        )
 
-    net = int(top['net_business'])
+    with col4:
+        net = int(top['net_business'])
 
-    col4.metric(
-        'Net Growth',
-        f'{net:,.0f}',
-        delta=net
-    )
+        render_kpi_card(
+            'Net Growth',
+            f'{net:,.0f}',
+         '#4CAF50' if net >= 0 else '#FF6B6B'
+        )
 
     st.divider()
 
